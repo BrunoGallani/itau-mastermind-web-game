@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 
+from app.config import utc_now
 from app.database import get_db
 from app.models import User, Session as SessionModel
 from app.schemas import UserCreate, UserLogin, UserResponse, AuthResponse
@@ -28,7 +29,7 @@ def register(user_data: UserCreate, response: Response, db: Session = Depends(ge
 
     session = SessionModel(
         user_id=user.id,
-        expires_at=datetime.utcnow() + timedelta(hours=SESSION_DURATION_HOURS),
+        expires_at=utc_now() + timedelta(hours=SESSION_DURATION_HOURS),
     )
     db.add(session)
     db.commit()
@@ -60,7 +61,7 @@ def login(user_data: UserLogin, response: Response, db: Session = Depends(get_db
 
     session = SessionModel(
         user_id=user.id,
-        expires_at=datetime.utcnow() + timedelta(hours=SESSION_DURATION_HOURS),
+        expires_at=utc_now() + timedelta(hours=SESSION_DURATION_HOURS),
     )
     db.add(session)
     db.commit()

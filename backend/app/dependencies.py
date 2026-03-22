@@ -1,6 +1,6 @@
-from datetime import datetime
 from fastapi import Depends, HTTPException, Cookie
 from sqlalchemy.orm import Session
+from app.config import utc_now
 from app.database import get_db
 from app.models import User, Session as SessionModel
 
@@ -15,7 +15,7 @@ def get_current_user(
     session = (
         db.query(SessionModel)
         .filter(SessionModel.id == session_id)
-        .filter(SessionModel.expires_at > datetime.utcnow())
+        .filter(SessionModel.expires_at > utc_now())
         .first()
     )
 
@@ -35,7 +35,7 @@ def get_optional_user(
     session = (
         db.query(SessionModel)
         .filter(SessionModel.id == session_id)
-        .filter(SessionModel.expires_at > datetime.utcnow())
+        .filter(SessionModel.expires_at > utc_now())
         .first()
     )
 

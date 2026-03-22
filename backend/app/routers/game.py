@@ -1,9 +1,9 @@
 from uuid import UUID
-from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
+from app.config import utc_now
 from app.database import get_db
 from app.models import Game, Guess, User
 from app.schemas import (
@@ -77,14 +77,14 @@ def submit_guess(
 
     if feedback["black_pegs"] == 4:
         game.status = "won"
-        game.finished_at = datetime.utcnow()
+        game.finished_at = utc_now()
         duration = int((game.finished_at - game.started_at).total_seconds())
         game.score = calculate_score(current_attempt, duration)
         score = game.score
         secret_code_to_reveal = game.secret_code
     elif current_attempt >= game.max_attempts:
         game.status = "lost"
-        game.finished_at = datetime.utcnow()
+        game.finished_at = utc_now()
         game.score = 0
         score = 0
         secret_code_to_reveal = game.secret_code
@@ -167,7 +167,7 @@ def get_game_state(
     if game.finished_at and game.started_at:
         duration = int((game.finished_at - game.started_at).total_seconds())
     elif game.started_at:
-        duration = int((datetime.utcnow() - game.started_at).total_seconds())
+        duration = int((utc_now() - game.started_at).total_seconds())
 
     return GameStateResponse(
         game_id=str(game.id),

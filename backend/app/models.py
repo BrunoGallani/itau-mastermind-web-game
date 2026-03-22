@@ -1,7 +1,7 @@
 import uuid
-from datetime import datetime
 from sqlalchemy import Column, String, Integer, ForeignKey, JSON, DateTime, TypeDecorator
 from sqlalchemy.orm import relationship
+from app.config import utc_now
 from app.database import Base
 
 
@@ -26,7 +26,7 @@ class User(Base):
     id = Column(UUIDString(), primary_key=True, default=uuid.uuid4)
     username = Column(String(50), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
     games = relationship("Game", back_populates="user")
     sessions = relationship("Session", back_populates="user")
@@ -37,7 +37,7 @@ class Session(Base):
 
     id = Column(UUIDString(), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUIDString(), ForeignKey("users.id"), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
     expires_at = Column(DateTime, nullable=False)
 
     user = relationship("User", back_populates="sessions")
@@ -51,7 +51,7 @@ class Game(Base):
     secret_code = Column(JSON, nullable=False)
     status = Column(String, nullable=False, default="in_progress")
     max_attempts = Column(Integer, nullable=False, default=10)
-    started_at = Column(DateTime, default=datetime.utcnow)
+    started_at = Column(DateTime, default=utc_now)
     finished_at = Column(DateTime, nullable=True)
     score = Column(Integer, nullable=True)
 
