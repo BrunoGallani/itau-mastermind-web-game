@@ -84,3 +84,40 @@ def test_password_too_short(client):
         json={"username": "validuser", "password": "12345"},
     )
     assert response.status_code == 422
+
+
+def test_get_stats_no_games(client):
+    response = client.get("/auth/me/stats")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["username"] == "testplayer"
+    assert data["total_games"] == 0
+    assert data["wins"] == 0
+    assert data["losses"] == 0
+    assert data["in_progress"] == 0
+    assert data["best_score"] is None
+
+
+def test_get_stats_with_games(client):
+    # Criar e finalizar um jogo
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+
+    for _ in range(10):
+        resp = client.post(
+            f"/games/{game_id}/guesses",
+            json={"colors": ["Red", "Red", "Red", "Red"]},
+        )
+        if resp.json()["status"] != "in_progress":
+            break
+
+    response = client.get("/auth/me/stats")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total_games"] == 1
+    assert data["wins"] + data["losses"] == 1
+
+
+def test_get_stats_unauthenticated(unauthenticated_client):
+    response = unauthenticated_client.get("/auth/me/stats")
+    assert response.status_code == 401

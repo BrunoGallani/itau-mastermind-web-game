@@ -40,6 +40,15 @@ class AuthResponse(BaseModel):
     user: UserResponse
 
 
+class UserStatsResponse(BaseModel):
+    username: str
+    total_games: int
+    wins: int
+    losses: int
+    in_progress: int
+    best_score: int | None = None
+
+
 # Game Schemas
 class GuessCreate(BaseModel):
     colors: list[str]
@@ -92,6 +101,17 @@ class GuessSubmitResponse(BaseModel):
     attempts_left: int
     score: int | None = None
     secret_code: list[str] | None = None
+
+
+class GameSummaryResponse(BaseModel):
+    game_id: str
+    status: str
+    attempts_used: int
+    max_attempts: int
+    score: int | None = None
+    started_at: datetime
+    finished_at: datetime | None = None
+    duration_seconds: int | None = None
 
 
 class RankingEntryResponse(BaseModel):

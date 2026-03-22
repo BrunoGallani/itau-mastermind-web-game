@@ -169,3 +169,69 @@ def test_game_state_has_timestamps(client):
     data = state_resp.json()
     assert data["started_at"] is not None
     assert "duration_seconds" in data
+
+
+def test_my_games_empty(client):
+    resp = client.get("/games/my-games/")
+    assert resp.status_code == 200
+    assert resp.json() == []
+
+
+def test_my_games_lists_user_games(client):
+    # Criar dois jogos
+    client.post("/games/")
+    client.post("/games/")
+
+    resp = client.get("/games/my-games/")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 2
+    # Verificar ordenação: mais recente primeiro
+    assert data[0]["started_at"] >= data[1]["started_at"]
+
+
+def test_my_games_has_correct_fields(client):
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+
+    # Submeter uma tentativa
+    client.post(
+        f"/games/{game_id}/guesses",
+        json={"colors": ["Red", "Blue", "Green", "Yellow"]},
+    )
+
+    resp = client.get("/games/my-games/")
+    data = resp.json()
+    assert len(data) == 1
+    entry = data[0]
+    assert entry["game_id"] == game_id
+    assert entry["status"] in ("in_progress", "won")
+    assert entry["attempts_used"] == 1
+    assert entry["max_attempts"] == 10
+    assert entry["started_at"] is not None
+    assert "duration_seconds" in entry
+
+
+def test_my_games_unauthenticated(unauthenticated_client):
+    resp = unauthenticated_client.get("/games/my-games/")
+    assert resp.status_code == 401
+
+
+def test_my_games_shows_finished_game_score(client):
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+
+    for _ in range(10):
+        resp = client.post(
+            f"/games/{game_id}/guesses",
+            json={"colors": ["Purple", "Purple", "Purple", "Purple"]},
+        )
+        if resp.json()["status"] != "in_progress":
+            break
+
+    resp = client.get("/games/my-games/")
+    data = resp.json()
+    finished = [g for g in data if g["status"] != "in_progress"]
+    assert len(finished) >= 1
+    assert finished[0]["score"] is not None
+    assert finished[0]["finished_at"] is not None
