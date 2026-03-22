@@ -1,0 +1,25 @@
+# Case documentations
+*.pdf
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.env
+*.db
+.pytest_cache/
+data/
+
+# Frontend (legado Angular — removido)
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+Thumbs.db
+.DS_Store
