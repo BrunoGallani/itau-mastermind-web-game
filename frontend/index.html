@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastermind - Jogo de Quebra de Código</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- NAVBAR - Barra de navegação no topo                          -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <nav class="navbar">
+        <h1 class="logo">🎯 Mastermind</h1>
+        <div class="nav-links" id="nav-links" style="display: none;">
+            <button onclick="showSection('dashboard')" class="nav-btn">Início</button>
+            <button onclick="showSection('game')" class="nav-btn">Jogar</button>
+            <button onclick="showSection('history')" class="nav-btn">Histórico</button>
+            <button onclick="showSection('ranking')" class="nav-btn">Ranking</button>
+        </div>
+        <div class="nav-user" id="nav-user" style="display: none;">
+            <span id="nav-username"></span>
+            <button onclick="handleLogout()" class="nav-btn nav-btn-logout">Sair</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- AUTH - Tela de login e registro                              -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <section id="auth" class="section" style="display: none;">
+            <div class="auth-container">
+                <!-- Formulário de Login -->
+                <div id="login-form" class="auth-card">
+                    <h2>🔐 Entrar</h2>
+                    <p class="auth-subtitle">Faça login para jogar Mastermind</p>
+                    <form onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="login-username">Usuário</label>
+                            <input type="text" id="login-username" placeholder="Seu nome de usuário"
+                                   minlength="3" maxlength="50" required autocomplete="username">
+                            <span class="field-error" id="login-username-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Senha</label>
+                            <input type="password" id="login-password" placeholder="Sua senha"
+                                   minlength="6" required autocomplete="current-password">
+                            <span class="field-error" id="login-password-error"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large btn-full" id="login-btn">
+                            Entrar
+                        </button>
+                    </form>
+                    <p class="auth-toggle">
+                        Não tem conta? <a href="#" onclick="showAuthForm('register'); return false;">Cadastre-se</a>
+                    </p>
+                </div>
+
+                <!-- Formulário de Registro -->
+                <div id="register-form" class="auth-card" style="display: none;">
+                    <h2>📝 Criar Conta</h2>
+                    <p class="auth-subtitle">Registre-se para começar a jogar</p>
+                    <form onsubmit="handleRegister(event)">
+                        <div class="form-group">
+                            <label for="register-username">Usuário</label>
+                            <input type="text" id="register-username" placeholder="Escolha um nome de usuário"
+                                   minlength="3" maxlength="50" required autocomplete="username">
+                            <span class="field-error" id="register-username-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Senha</label>
+                            <input type="password" id="register-password" placeholder="Crie uma senha (mín. 6 caracteres)"
+                                   minlength="6" required autocomplete="new-password">
+                            <span class="field-error" id="register-password-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password-confirm">Confirmar Senha</label>
+                            <input type="password" id="register-password-confirm" placeholder="Repita a senha"
+                                   required autocomplete="new-password">
+                            <span class="field-error" id="register-confirm-error"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large btn-full" id="register-btn">
+                            Cadastrar
+                        </button>
+                    </form>
+                    <p class="auth-toggle">
+                        Já tem conta? <a href="#" onclick="showAuthForm('login'); return false;">Faça login</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- DASHBOARD - Tela inicial com regras e mini-ranking          -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <section id="dashboard" class="section" style="display: none;">
+            <div class="welcome-card">
+                <h2>🎮 Olá, <span id="welcome-username">Jogador</span>!</h2>
+                <p class="subtitle">O clássico jogo de dedução lógica</p>
+
+                <!-- Estatísticas do usuário -->
+                <div id="user-stats" class="user-stats-card" style="display: none;">
+                    <div class="stats-summary">
+                        <div class="stat-box">
+                            <span class="stat-value" id="user-total-games">0</span>
+                            <span class="stat-label">Partidas</span>
+                        </div>
+                        <div class="stat-box wins">
+                            <span class="stat-value" id="user-wins">0</span>
+                            <span class="stat-label">Vitórias</span>
+                        </div>
+                        <div class="stat-box losses">
+                            <span class="stat-value" id="user-losses">0</span>
+                            <span class="stat-label">Derrotas</span>
+                        </div>
+                        <div class="stat-box best-score">
+                            <span class="stat-value" id="user-best-score">-</span>
+                            <span class="stat-label">Melhor Pontuação</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rules-box">
+                    <h3>📜 Regras do Jogo</h3>
+                    <ul>
+                        <li><strong>Objetivo:</strong> Descobrir o código secreto de 4 cores.</li>
+                        <li><strong>Tentativas:</strong> Você tem 10 chances para acertar.</li>
+                        <li><strong>Pino Preto ⚫:</strong> Cor certa na posição certa.</li>
+                        <li><strong>Pino Branco ⚪:</strong> Cor certa na posição errada.</li>
+                        <li><strong>Dica:</strong> Use a lógica para eliminar possibilidades!</li>
+                    </ul>
+                </div>
+
+                <button onclick="startNewGame()" class="btn btn-primary btn-large">
+                    🚀 Iniciar Novo Jogo
+                </button>
+            </div>
+
+            <!-- Mini-ranking na dashboard -->
+            <div class="mini-ranking">
+                <h3>🏆 Últimas Partidas</h3>
+                <div id="mini-ranking-list" class="ranking-list">
+                    <p class="loading">Carregando...</p>
+                </div>
+                <button onclick="showSection('ranking')" class="btn btn-secondary">
+                    Ver Ranking Completo →
+                </button>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- GAME - Tela do jogo                                          -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <section id="game" class="section" style="display: none;">
+            <div class="game-container">
+                <!-- Status do jogo -->
+                <div id="game-status" class="game-status">
+                    <p>Clique em "Iniciar Novo Jogo" na tela inicial para começar.</p>
+                </div>
+
+                <!-- Timer do jogo -->
+                <div id="game-timer" class="game-timer" style="display: none;">
+                    ⏱️ Tempo: <span id="timer-value">00:00</span>
+                </div>
+
+                <!-- Seletor de cores -->
+                <div id="color-picker" class="color-picker" style="display: none;">
+                    <h3>Escolha uma cor:</h3>
+                    <div class="color-options">
+                        <button class="color-btn" data-color="Red" style="background-color: #e74c3c;" onclick="selectColor('Red')"></button>
+                        <button class="color-btn" data-color="Blue" style="background-color: #3498db;" onclick="selectColor('Blue')"></button>
+                        <button class="color-btn" data-color="Green" style="background-color: #27ae60;" onclick="selectColor('Green')"></button>
+                        <button class="color-btn" data-color="Yellow" style="background-color: #f1c40f;" onclick="selectColor('Yellow')"></button>
+                        <button class="color-btn" data-color="Orange" style="background-color: #e67e22;" onclick="selectColor('Orange')"></button>
+                        <button class="color-btn" data-color="Purple" style="background-color: #9b59b6;" onclick="selectColor('Purple')"></button>
+                    </div>
+                </div>
+
+                <!-- Tentativa atual sendo construída -->
+                <div id="current-guess" class="current-guess" style="display: none;">
+                    <h3>Sua tentativa:</h3>
+                    <div class="guess-slots" id="guess-slots">
+                        <div class="slot-wrapper"><span class="slot-label">A</span><div class="slot empty"></div></div>
+                        <div class="slot-wrapper"><span class="slot-label">B</span><div class="slot empty"></div></div>
+                        <div class="slot-wrapper"><span class="slot-label">C</span><div class="slot empty"></div></div>
+                        <div class="slot-wrapper"><span class="slot-label">D</span><div class="slot empty"></div></div>
+                    </div>
+                    <div class="guess-actions">
+                        <button onclick="removeLastColor()" class="btn btn-secondary">← Remover</button>
+                        <button onclick="clearCurrentGuess()" class="btn btn-secondary">Limpar</button>
+                        <button onclick="sendGuess()" id="submit-btn" class="btn btn-primary" disabled>Enviar ✓</button>
+                    </div>
+                </div>
+
+                <!-- Histórico de tentativas -->
+                <div id="guesses-history" class="guesses-history">
+                    <h3>📝 Histórico de Tentativas</h3>
+                    <div id="guesses-list" class="guesses-list">
+                        <p class="empty-message">Nenhuma tentativa ainda.</p>
+                    </div>
+                </div>
+
+                <!-- Mensagem de fim de jogo -->
+                <div id="game-result" class="game-result" style="display: none;">
+                    <h2 id="result-title"></h2>
+                    <p id="result-message"></p>
+                    <p id="result-score" class="result-score"></p>
+                    <div id="secret-code-reveal" class="secret-code-reveal"></div>
+                    <button onclick="startNewGame()" class="btn btn-primary btn-large">
+                        🔄 Jogar Novamente
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- HISTÓRICO - Partidas do usuário                              -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <section id="history" class="section" style="display: none;">
+            <div class="ranking-container">
+                <h2>📋 Minhas Partidas</h2>
+
+                <div class="ranking-table-container">
+                    <table class="ranking-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Status</th>
+                                <th>Tentativas</th>
+                                <th>Pontuação</th>
+                                <th>Duração</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <tr>
+                                <td colspan="6" class="loading">Carregando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button onclick="showSection('dashboard')" class="btn btn-secondary">
+                    ← Voltar ao Início
+                </button>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- RANKING - Tabela completa de resultados                     -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <section id="ranking" class="section" style="display: none;">
+            <div class="ranking-container">
+                <h2>🏆 Ranking de Partidas</h2>
+
+                <div class="stats-summary" id="stats-summary">
+                    <div class="stat-box">
+                        <span class="stat-value" id="total-games">0</span>
+                        <span class="stat-label">Total de Jogos</span>
+                    </div>
+                    <div class="stat-box wins">
+                        <span class="stat-value" id="total-wins">0</span>
+                        <span class="stat-label">Vitórias</span>
+                    </div>
+                    <div class="stat-box losses">
+                        <span class="stat-value" id="total-losses">0</span>
+                        <span class="stat-label">Derrotas</span>
+                    </div>
+                </div>
+
+                <div id="ranking-table-container" class="ranking-table-container">
+                    <table class="ranking-table">
+                        <thead>
+                            <tr>
+                                <th>Posição</th>
+                                <th>Jogador</th>
+                                <th>Status</th>
+                                <th>Tentativas</th>
+                                <th>Pontuação</th>
+                                <th>Duração</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ranking-table-body">
+                            <tr>
+                                <td colspan="6" class="loading">Carregando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button onclick="showSection('dashboard')" class="btn btn-secondary">
+                    ← Voltar ao Início
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Mensagem de erro global -->
+    <div id="error-toast" class="toast error-toast" style="display: none;">
+        <span id="error-message"></span>
+        <button onclick="hideError()" class="close-btn">×</button>
+    </div>
+
+    <!-- Mensagem de sucesso global -->
+    <div id="success-toast" class="toast success-toast" style="display: none;">
+        <span id="success-message"></span>
+        <button onclick="hideSuccess()" class="close-btn">×</button>
+    </div>
+
+    <footer class="footer">
+        <p>Mastermind Game — Case Técnico Itaú | Feito com ❤️ em Python + JavaScript</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/validation.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

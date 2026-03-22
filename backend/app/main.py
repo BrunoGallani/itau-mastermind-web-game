@@ -76,6 +76,10 @@ if FRONTEND_DIR.exists():
     app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="css")
     app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="js")
 
+    @app.get("/favicon.svg")
+    async def serve_favicon():
+        return FileResponse(FRONTEND_DIR / "favicon.svg", media_type="image/svg+xml")
+
     @app.get("/")
     async def serve_frontend():
         return FileResponse(FRONTEND_DIR / "index.html")
