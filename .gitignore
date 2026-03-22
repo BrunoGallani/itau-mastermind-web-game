@@ -12,8 +12,8 @@ build/
 .pytest_cache/
 data/
 
-# Frontend (legado Angular — removido)
-node_modules/
+# Ambiente virtual
+.venv
 
 # IDE
 .vscode/

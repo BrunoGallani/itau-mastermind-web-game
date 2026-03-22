@@ -1,10 +1,11 @@
 from uuid import UUID
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from app.database import get_db
-from app.models import Game, Guess
+from app.models import Game, Guess, User
 from app.schemas import (
     GuessCreate,
     GameCreateResponse,
@@ -14,15 +15,21 @@ from app.schemas import (
     FeedbackResponse,
     RankingEntryResponse,
 )
-from app.game_logic import generate_secret_code, evaluate_guess, MAX_ATTEMPTS
+from app.game_logic import generate_secret_code, evaluate_guess, calculate_score, MAX_ATTEMPTS
+from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/games", tags=["games"])
 
 
 @router.post("/", response_model=GameCreateResponse, status_code=status.HTTP_201_CREATED)
-def create_game(db: Session = Depends(get_db)):
+def create_game(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     secret = generate_secret_code()
-    game = Game(secret_code=secret, status="in_progress", max_attempts=MAX_ATTEMPTS)
+    game = Game(
+        user_id=user.id,
+        secret_code=secret,
+        status="in_progress",
+        max_attempts=MAX_ATTEMPTS,
+    )
     db.add(game)
     db.commit()
     db.refresh(game)
@@ -37,8 +44,13 @@ def create_game(db: Session = Depends(get_db)):
     response_model=GuessSubmitResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def submit_guess(game_id: UUID, guess_data: GuessCreate, db: Session = Depends(get_db)):
-    game = db.query(Game).filter(Game.id == game_id).first()
+def submit_guess(
+    game_id: UUID,
+    guess_data: GuessCreate,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    game = db.query(Game).filter(Game.id == game_id, Game.user_id == user.id).first()
     if not game:
         raise HTTPException(status_code=404, detail="Jogo não encontrado.")
 
@@ -61,11 +73,20 @@ def submit_guess(game_id: UUID, guess_data: GuessCreate, db: Session = Depends(g
     db.add(guess)
 
     secret_code_to_reveal = None
+    score = None
+
     if feedback["black_pegs"] == 4:
         game.status = "won"
+        game.finished_at = datetime.utcnow()
+        duration = int((game.finished_at - game.started_at).total_seconds())
+        game.score = calculate_score(current_attempt, duration)
+        score = game.score
         secret_code_to_reveal = game.secret_code
     elif current_attempt >= game.max_attempts:
         game.status = "lost"
+        game.finished_at = datetime.utcnow()
+        game.score = 0
+        score = 0
         secret_code_to_reveal = game.secret_code
 
     db.commit()
@@ -75,6 +96,7 @@ def submit_guess(game_id: UUID, guess_data: GuessCreate, db: Session = Depends(g
         feedback=FeedbackResponse(**feedback),
         status=game.status,
         attempts_left=game.max_attempts - current_attempt,
+        score=score,
         secret_code=secret_code_to_reveal,
     )
 
@@ -91,27 +113,40 @@ def get_ranking(db: Session = Depends(get_db)):
     )
 
     results = (
-        db.query(Game, attempts_subq.c.attempts_used)
+        db.query(Game, User.username, attempts_subq.c.attempts_used)
+        .join(User, Game.user_id == User.id)
         .outerjoin(attempts_subq, Game.id == attempts_subq.c.game_id)
         .filter(Game.status.in_(["won", "lost"]))
-        .order_by(Game.status.desc(), attempts_subq.c.attempts_used.asc())
+        .order_by(Game.score.desc().nullslast(), attempts_subq.c.attempts_used.asc())
         .all()
     )
 
-    return [
-        RankingEntryResponse(
-            game_id=str(game.id),
-            status=game.status,
-            attempts_used=attempts_used or 0,
-            max_attempts=game.max_attempts,
+    ranking = []
+    for game, username, attempts_used in results:
+        duration = None
+        if game.finished_at and game.started_at:
+            duration = int((game.finished_at - game.started_at).total_seconds())
+        ranking.append(
+            RankingEntryResponse(
+                game_id=str(game.id),
+                username=username,
+                status=game.status,
+                attempts_used=attempts_used or 0,
+                max_attempts=game.max_attempts,
+                score=game.score,
+                duration_seconds=duration,
+            )
         )
-        for game, attempts_used in results
-    ]
+    return ranking
 
 
 @router.get("/{game_id}", response_model=GameStateResponse)
-def get_game_state(game_id: UUID, db: Session = Depends(get_db)):
-    game = db.query(Game).filter(Game.id == game_id).first()
+def get_game_state(
+    game_id: UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    game = db.query(Game).filter(Game.id == game_id, Game.user_id == user.id).first()
     if not game:
         raise HTTPException(status_code=404, detail="Jogo não encontrado.")
 
@@ -128,11 +163,21 @@ def get_game_state(game_id: UUID, db: Session = Depends(get_db)):
     if game.status != "in_progress":
         secret_code_to_reveal = game.secret_code
 
+    duration = None
+    if game.finished_at and game.started_at:
+        duration = int((game.finished_at - game.started_at).total_seconds())
+    elif game.started_at:
+        duration = int((datetime.utcnow() - game.started_at).total_seconds())
+
     return GameStateResponse(
         game_id=str(game.id),
         status=game.status,
         attempts_left=game.max_attempts - len(game.guesses),
         max_attempts=game.max_attempts,
+        started_at=game.started_at,
+        finished_at=game.finished_at,
+        duration_seconds=duration,
+        score=game.score,
         guesses=guesses,
         secret_code=secret_code_to_reveal,
     )

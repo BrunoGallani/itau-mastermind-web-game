@@ -1,4 +1,4 @@
-from app.game_logic import generate_secret_code, evaluate_guess, VALID_COLORS, CODE_LENGTH
+from app.game_logic import generate_secret_code, evaluate_guess, calculate_score, VALID_COLORS, CODE_LENGTH
 
 
 class TestGenerateSecretCode:
@@ -58,3 +58,25 @@ class TestEvaluateGuess:
         guess = ["Red", "Red", "Red", "Red"]
         result = evaluate_guess(secret, guess)
         assert result == {"black_pegs": 2, "white_pegs": 0}
+
+
+class TestCalculateScore:
+    def test_first_attempt_no_time(self):
+        score = calculate_score(attempts_used=1, duration_seconds=0)
+        assert score == 1000
+
+    def test_penalty_per_attempt(self):
+        score = calculate_score(attempts_used=5, duration_seconds=0)
+        assert score == 600
+
+    def test_penalty_per_time(self):
+        score = calculate_score(attempts_used=1, duration_seconds=100)
+        assert score == 990
+
+    def test_max_attempts_high_time(self):
+        score = calculate_score(attempts_used=10, duration_seconds=300)
+        assert score == 70
+
+    def test_never_negative(self):
+        score = calculate_score(attempts_used=10, duration_seconds=9999)
+        assert score == 0

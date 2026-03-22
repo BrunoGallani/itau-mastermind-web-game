@@ -100,7 +100,72 @@ def test_secret_code_hidden_during_game(client):
     assert data["secret_code"] is None
 
 
-def test_health_check(client):
-    resp = client.get("/health")
+def test_health_check(unauthenticated_client):
+    resp = unauthenticated_client.get("/health")
     assert resp.status_code == 200
     assert resp.json() == {"status": "ok"}
+
+
+def test_create_game_unauthenticated(unauthenticated_client):
+    response = unauthenticated_client.post("/games/")
+    assert response.status_code == 401
+
+
+def test_ranking_empty(unauthenticated_client):
+    resp = unauthenticated_client.get("/games/ranking/")
+    assert resp.status_code == 200
+    assert resp.json() == []
+
+
+def test_ranking_after_game(client):
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+
+    for _ in range(10):
+        resp = client.post(
+            f"/games/{game_id}/guesses",
+            json={"colors": ["Red", "Red", "Red", "Red"]},
+        )
+        if resp.json()["status"] != "in_progress":
+            break
+
+    ranking_resp = client.get("/games/ranking/")
+    assert ranking_resp.status_code == 200
+    data = ranking_resp.json()
+    assert len(data) >= 1
+    entry = data[0]
+    assert entry["game_id"] == game_id
+    assert entry["username"] == "testplayer"
+    assert entry["status"] in ("won", "lost")
+    assert "score" in entry
+    assert "duration_seconds" in entry
+
+
+def test_game_loss_after_max_attempts(client):
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+
+    last_resp = None
+    for _ in range(10):
+        last_resp = client.post(
+            f"/games/{game_id}/guesses",
+            json={"colors": ["Purple", "Purple", "Purple", "Purple"]},
+        )
+        if last_resp.json()["status"] != "in_progress":
+            break
+
+    data = last_resp.json()
+    if data["status"] == "lost":
+        assert data["score"] == 0
+        assert data["secret_code"] is not None
+        assert len(data["secret_code"]) == 4
+
+
+def test_game_state_has_timestamps(client):
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+
+    state_resp = client.get(f"/games/{game_id}")
+    data = state_resp.json()
+    assert data["started_at"] is not None
+    assert "duration_seconds" in data

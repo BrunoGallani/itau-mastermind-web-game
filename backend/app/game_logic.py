@@ -28,3 +28,10 @@ def evaluate_guess(secret: list[str], guess: list[str]) -> dict:
             secret_remaining.remove(color)
 
     return {"black_pegs": black_pegs, "white_pegs": white_pegs}
+
+
+def calculate_score(attempts_used: int, duration_seconds: int) -> int:
+    base_score = 1000
+    attempt_penalty = (attempts_used - 1) * 100
+    time_penalty = duration_seconds // 10
+    return max(0, base_score - attempt_penalty - time_penalty)
