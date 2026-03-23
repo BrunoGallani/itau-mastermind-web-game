@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastermind — Testes do Frontend</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f6fa;
+            color: #2c3e50;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { color: #003366; margin-bottom: 0.5rem; }
+        h2 { color: #7f8c8d; font-weight: normal; margin-bottom: 2rem; }
+        h3 {
+            color: #003366;
+            margin: 1.5rem 0 0.5rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid #dfe6e9;
+        }
+        .test-pass { color: #27ae60; padding: 0.25rem 0 0.25rem 1rem; }
+        .test-fail { color: #e74c3c; padding: 0.25rem 0 0.25rem 1rem; font-weight: bold; }
+        .test-fail code {
+            font-weight: normal;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+        }
+        #test-summary {
+            margin-top: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        .summary-pass { background: rgba(39, 174, 96, 0.15); color: #27ae60; }
+        .summary-fail { background: rgba(231, 76, 60, 0.15); color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Testes do Frontend — Mastermind</h1>
+    <h2>Resultados dos testes unitários</h2>
+
+    <div id="test-output"></div>
+    <div id="test-summary"></div>
+
+    <script src="../js/validation.js"></script>
+
+    <!-- COLOR_MAP e renderFeedback replicados aqui (definidos em app.js que depende do DOM) -->
+    <script>
+        const COLOR_MAP = {
+            'Red': '#e74c3c', 'Blue': '#3498db', 'Green': '#27ae60',
+            'Yellow': '#f1c40f', 'Orange': '#e67e22', 'Purple': '#9b59b6',
+        };
+
+        function renderFeedback(feedback) {
+            let html = '';
+            for (let i = 0; i < feedback.black_pegs; i++)
+                html += '<div class="peg black" title="Cor e posição corretas"></div>';
+            for (let i = 0; i < feedback.white_pegs; i++)
+                html += '<div class="peg white" title="Cor correta, posição errada"></div>';
+            return html;
+        }
+    </script>
+
+    <script src="test-utils.js"></script>
+    <script src="test-validation.js"></script>
+    <script src="test-game-logic.js"></script>
+    <script>showTestSummary();</script>
+</body>
+</html>
