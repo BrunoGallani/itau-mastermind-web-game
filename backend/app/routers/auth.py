@@ -72,5 +72,6 @@ def get_me_stats(
         wins=stats["wins"],
         losses=stats["losses"],
         in_progress=stats["in_progress"],
+        abandoned=stats["abandoned"],
         best_score=stats["best_score"],
     )

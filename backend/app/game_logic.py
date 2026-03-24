@@ -13,6 +13,7 @@ class GameStatus:
     IN_PROGRESS = "in_progress"
     WON = "won"
     LOST = "lost"
+    ABANDONED = "abandoned"
 
 
 def generate_secret_code() -> list[str]:

@@ -46,6 +46,7 @@ class UserStatsResponse(BaseModel):
     wins: int
     losses: int
     in_progress: int
+    abandoned: int
     best_score: int | None = None
 
 
@@ -79,6 +80,14 @@ class GuessResponse(BaseModel):
 class GameCreateResponse(BaseModel):
     game_id: str
     message: str
+
+
+class AbandonResponse(BaseModel):
+    game_id: str
+    status: str
+    message: str
+    duration_seconds: int | None = None
+    secret_code: list[str]
 
 
 class GameStateResponse(BaseModel):

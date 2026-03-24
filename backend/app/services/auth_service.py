@@ -53,6 +53,7 @@ def get_user_stats(user: User, db: Session) -> dict:
     wins = sum(1 for g in games if g.status == GameStatus.WON)
     losses = sum(1 for g in games if g.status == GameStatus.LOST)
     in_progress = sum(1 for g in games if g.status == GameStatus.IN_PROGRESS)
+    abandoned = sum(1 for g in games if g.status == GameStatus.ABANDONED)
 
     best_score = None
     won_games = [g for g in games if g.status == GameStatus.WON and g.score is not None]
@@ -64,6 +65,7 @@ def get_user_stats(user: User, db: Session) -> dict:
         "wins": wins,
         "losses": losses,
         "in_progress": in_progress,
+        "abandoned": abandoned,
         "best_score": best_score,
     }
 

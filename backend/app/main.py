@@ -5,8 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.exceptions import RequestValidationError
-from app.database import engine, Base
+from app.database import engine, Base, SessionLocal
 from app.routers import game, auth
+from app.services.game_service import abandon_stale_games
 import app.models  # noqa: F401
 
 FRONTEND_DIR = Path(__file__).parent.parent.parent / "frontend"
@@ -17,6 +18,11 @@ if not FRONTEND_DIR.exists():
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        abandon_stale_games(db)
+    finally:
+        db.close()
     yield
 
 

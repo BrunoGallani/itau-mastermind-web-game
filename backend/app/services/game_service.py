@@ -15,6 +15,16 @@ from app.game_logic import (
 )
 
 
+def abandon_stale_games(db: Session) -> int:
+    """Abandona jogos que ficaram em andamento após reinício do servidor."""
+    stale = db.query(Game).filter(Game.status == GameStatus.IN_PROGRESS).all()
+    for game in stale:
+        game.status = GameStatus.ABANDONED
+        game.score = 0
+    db.commit()
+    return len(stale)
+
+
 def _get_user_game(game_id: UUID, user: User, db: Session) -> Game:
     game = db.query(Game).filter(Game.id == game_id, Game.user_id == user.id).first()
     if not game:
@@ -25,9 +35,25 @@ def _get_user_game(game_id: UUID, user: User, db: Session) -> Game:
 def calculate_duration(game: Game) -> int | None:
     if game.finished_at and game.started_at:
         return int((game.finished_at - game.started_at).total_seconds())
-    elif game.started_at:
-        return int((utc_now() - game.started_at).total_seconds())
     return None
+
+
+def abandon_game(game_id: UUID, user: User, db: Session) -> Game:
+    """Abandona um jogo em andamento."""
+    game = _get_user_game(game_id, user, db)
+
+    if game.status != GameStatus.IN_PROGRESS:
+        raise HTTPException(
+            status_code=400,
+            detail="Apenas jogos em andamento podem ser abandonados.",
+        )
+
+    game.status = GameStatus.ABANDONED
+    game.finished_at = utc_now()
+    game.score = 0
+    db.commit()
+    db.refresh(game)
+    return game
 
 
 def create_game(user: User, db: Session) -> Game:

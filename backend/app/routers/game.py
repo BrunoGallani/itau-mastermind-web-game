@@ -13,12 +13,14 @@ from app.schemas import (
     GuessResponse,
     FeedbackResponse,
     RankingEntryResponse,
+    AbandonResponse,
 )
 from app.dependencies import get_current_user
 from app.game_logic import GameStatus
 from app.services.game_service import (
     create_game,
     submit_guess,
+    abandon_game,
     get_game_state,
     get_user_games,
     get_ranking,
@@ -84,6 +86,22 @@ def get_my_games(
         )
         for game in games
     ]
+
+
+@router.post("/{game_id}/abandon", response_model=AbandonResponse)
+def abandon_game_endpoint(
+    game_id: UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    game = abandon_game(game_id, user, db)
+    return AbandonResponse(
+        game_id=str(game.id),
+        status=game.status,
+        message="Jogo abandonado.",
+        duration_seconds=calculate_duration(game),
+        secret_code=game.secret_code,
+    )
 
 
 @router.get("/{game_id}", response_model=GameStateResponse)
