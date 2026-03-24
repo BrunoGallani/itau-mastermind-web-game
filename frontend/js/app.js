@@ -564,7 +564,7 @@ async function loadMiniRanking() {
 
         listDiv.innerHTML = recent.map(game => `
             <div class="ranking-item ${game.status}">
-                <span>${game.status === 'won' ? '🏆' : '💔'} ${game.username} — ${game.status === 'won' ? 'Vitória' : 'Derrota'}</span>
+                <span>${game.status === 'won' ? '🏆' : '💔'} ${game.username} -${game.status === 'won' ? 'Vitória' : 'Derrota'}</span>
                 <span>${game.score !== null ? game.score + ' pts' : '-'}</span>
             </div>
         `).join('');

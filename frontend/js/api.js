@@ -1,4 +1,4 @@
-// URL relativa (same-origin) — frontend servido pelo FastAPI
+// URL relativa (same-origin) -frontend servido pelo FastAPI
 const API_URL = '';
 
 /**

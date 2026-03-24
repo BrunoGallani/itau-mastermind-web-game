@@ -2,20 +2,20 @@
 
 Implementação full-stack do clássico jogo de quebra de código **Mastermind**, desenvolvido como case técnico para a vaga de **Engenheiro de Software Full-Stack Jr** no Itaú.
 
-O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, recebendo feedback lógico a cada palpite — pinos pretos (cor e posição corretas) e pinos brancos (cor certa, posição errada).
+O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, recebendo feedback lógico a cada palpite - pinos pretos (cor e posição corretas) e pinos brancos (cor certa, posição errada).
 
 ---
 
 ## Funcionalidades
 
-- **Autenticação completa** — registro, login e logout com sessões via cookie (httponly)
-- **Jogo interativo** — seletor de cores visual, timer em tempo real e feedback com pinos
-- **Sistema de pontuação** — cálculo baseado em tentativas e tempo (máx. 1000 pontos)
-- **Ranking global** — tabela pública com todos os jogadores ordenados por pontuação
-- **Histórico pessoal** — todas as partidas do usuário com status, duração e timestamps
-- **Dashboard personalizado** — estatísticas do jogador, regras e mini-ranking
-- **Abandono de partida** — possibilidade de abandonar jogos em andamento
-- **Responsivo** — interface adaptada para desktop e mobile (breakpoint em 600px)
+- **Autenticação completa** - registro, login e logout com sessões via cookie (httponly)
+- **Jogo interativo** - seletor de cores visual, timer em tempo real e feedback com pinos
+- **Sistema de pontuação** - cálculo baseado em tentativas e tempo (máx. 1000 pontos)
+- **Ranking global** - tabela pública com todos os jogadores ordenados por pontuação
+- **Histórico pessoal** - todas as partidas do usuário com status, duração e timestamps
+- **Dashboard personalizado** - estatísticas do jogador, regras e mini-ranking
+- **Abandono de partida** - possibilidade de abandonar jogos em andamento
+- **Responsivo** - interface adaptada para desktop e mobile (breakpoint em 600px)
 
 ---
 
@@ -75,8 +75,8 @@ O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, re
 - Cores **podem se repetir** no código secreto
 - O jogador tem **10 tentativas** para adivinhar o código
 - Após cada tentativa, o sistema retorna feedback:
-  - **Pino preto ⚫** — cor certa na posição certa
-  - **Pino branco ⚪** — cor certa na posição errada
+  - **Pino preto ⚫** - cor certa na posição certa
+  - **Pino branco ⚪** - cor certa na posição errada
 - **Vitória**: 4 pinos pretos (código decifrado)
 - **Derrota**: 10 tentativas sem acertar
 - **Pontuação**: `1000 - (tentativas - 1) × 100 - tempo_em_segundos ÷ 10` (mínimo 0)
@@ -150,7 +150,7 @@ python -m pytest app/tests/test_api.py -v
 python -m pytest app/tests/test_auth.py -v
 ```
 
-Os testes usam SQLite em memória (`StaticPool`) — não afetam o banco de dados real.
+Os testes usam SQLite em memória (`StaticPool`) - não afetam o banco de dados real.
 
 ### Frontend
 
@@ -206,7 +206,7 @@ mastermind-web-game/
 │           ├── test_api.py       # Testes de integração (jogo)
 │           └── test_auth.py      # Testes de integração (auth)
 ├── frontend/
-│   ├── index.html                # SPA — seções: auth, dashboard, game, history, ranking
+│   ├── index.html                # SPA - seções: auth, dashboard, game, history, ranking
 │   ├── favicon.svg               # Ícone do site
 │   ├── css/
 │   │   └── style.css             # Estilos (variáveis CSS, responsivo)
