@@ -22,6 +22,17 @@ const COLOR_MAP = {
     'Purple': '#9b59b6',
 };
 
+const POSITION_LABELS = ['A', 'B', 'C', 'D'];
+
+const TOAST_DURACAO_ERRO = 5000;
+const TOAST_DURACAO_SUCESSO = 3000;
+
+const SECTION_LOADERS = {
+    ranking: () => loadRanking(),
+    history: () => loadMyGames(),
+    dashboard: () => { loadUserStats(); loadMiniRanking(); },
+};
+
 
 // ── Autenticação ────────────────────────────────────────
 
@@ -52,6 +63,20 @@ function updateNavbar() {
     }
 }
 
+async function withButtonLoading(buttonId, loadingText, originalText, action) {
+    const btn = document.getElementById(buttonId);
+    btn.disabled = true;
+    btn.textContent = loadingText;
+    try {
+        await action();
+    } catch (error) {
+        showError(error.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+}
+
 async function handleLogin(event) {
     event.preventDefault();
     clearFieldErrors('login');
@@ -60,31 +85,22 @@ async function handleLogin(event) {
     const password = document.getElementById('login-password').value;
 
     let hasError = false;
-    if (username.length < 3 || username.length > 50) {
-        showFieldError('login-username-error', 'Usuário deve ter entre 3 e 50 caracteres.');
+    if (username.length < VALIDATION_RULES.USERNAME_MIN || username.length > VALIDATION_RULES.USERNAME_MAX) {
+        showFieldError('login-username-error', `Usuário deve ter entre ${VALIDATION_RULES.USERNAME_MIN} e ${VALIDATION_RULES.USERNAME_MAX} caracteres.`);
         hasError = true;
     }
-    if (password.length < 6) {
-        showFieldError('login-password-error', 'Senha deve ter no mínimo 6 caracteres.');
+    if (password.length < VALIDATION_RULES.PASSWORD_MIN) {
+        showFieldError('login-password-error', `Senha deve ter no mínimo ${VALIDATION_RULES.PASSWORD_MIN} caracteres.`);
         hasError = true;
     }
     if (hasError) return;
 
-    const btn = document.getElementById('login-btn');
-    btn.disabled = true;
-    btn.textContent = 'Entrando...';
-
-    try {
+    await withButtonLoading('login-btn', 'Entrando...', 'Entrar', async () => {
         await login(username, password);
         await checkAuth();
         showSection('dashboard');
         showSuccess(`Bem-vindo, ${currentUser.username}!`);
-    } catch (error) {
-        showError(error.message);
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'Entrar';
-    }
+    });
 }
 
 async function handleRegister(event) {
@@ -96,12 +112,12 @@ async function handleRegister(event) {
     const confirm = document.getElementById('register-password-confirm').value;
 
     let hasError = false;
-    if (username.length < 3 || username.length > 50) {
-        showFieldError('register-username-error', 'Usuário deve ter entre 3 e 50 caracteres.');
+    if (username.length < VALIDATION_RULES.USERNAME_MIN || username.length > VALIDATION_RULES.USERNAME_MAX) {
+        showFieldError('register-username-error', `Usuário deve ter entre ${VALIDATION_RULES.USERNAME_MIN} e ${VALIDATION_RULES.USERNAME_MAX} caracteres.`);
         hasError = true;
     }
-    if (password.length < 6) {
-        showFieldError('register-password-error', 'Senha deve ter no mínimo 6 caracteres.');
+    if (password.length < VALIDATION_RULES.PASSWORD_MIN) {
+        showFieldError('register-password-error', `Senha deve ter no mínimo ${VALIDATION_RULES.PASSWORD_MIN} caracteres.`);
         hasError = true;
     }
     if (password !== confirm) {
@@ -110,21 +126,12 @@ async function handleRegister(event) {
     }
     if (hasError) return;
 
-    const btn = document.getElementById('register-btn');
-    btn.disabled = true;
-    btn.textContent = 'Cadastrando...';
-
-    try {
+    await withButtonLoading('register-btn', 'Cadastrando...', 'Cadastrar', async () => {
         await register(username, password);
         await checkAuth();
         showSection('dashboard');
         showSuccess('Conta criada com sucesso!');
-    } catch (error) {
-        showError(error.message);
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'Cadastrar';
-    }
+    });
 }
 
 async function handleLogout() {
@@ -210,12 +217,8 @@ function showSection(sectionId) {
     const target = document.getElementById(sectionId);
     if (target) target.style.display = 'block';
 
-    if (sectionId === 'ranking') loadRanking();
-    if (sectionId === 'history') loadMyGames();
-    if (sectionId === 'dashboard') {
-        loadUserStats();
-        loadMiniRanking();
-    }
+    const loader = SECTION_LOADERS[sectionId];
+    if (loader) loader();
 }
 
 
@@ -297,16 +300,26 @@ function updateGameStatus() {
     const colorPicker = document.getElementById('color-picker');
     const currentGuessDiv = document.getElementById('current-guess');
 
-    if (gameStatus === 'idle') {
-        statusDiv.innerHTML = '<p>Clique em "Iniciar Novo Jogo" na tela inicial para começar.</p>';
-        statusDiv.className = 'game-status';
-        colorPicker.style.display = 'none';
-        currentGuessDiv.style.display = 'none';
-    } else if (gameStatus === 'in_progress') {
-        statusDiv.innerHTML = `<p><strong>Jogo em andamento!</strong> Tentativas restantes: <strong>${attemptsLeft}</strong></p>`;
-        statusDiv.className = 'game-status in-progress';
-        colorPicker.style.display = 'block';
-        currentGuessDiv.style.display = 'block';
+    const statusConfig = {
+        idle: {
+            html: '<p>Clique em "Iniciar Novo Jogo" na tela inicial para começar.</p>',
+            className: 'game-status',
+            showPicker: false,
+        },
+        in_progress: {
+            html: `<p><strong>Jogo em andamento!</strong> Tentativas restantes: <strong>${attemptsLeft}</strong></p>`,
+            className: 'game-status in-progress',
+            showPicker: true,
+        },
+    };
+
+    const config = statusConfig[gameStatus];
+    if (config) {
+        statusDiv.style.display = '';
+        statusDiv.innerHTML = config.html;
+        statusDiv.className = config.className;
+        colorPicker.style.display = config.showPicker ? 'block' : 'none';
+        currentGuessDiv.style.display = config.showPicker ? 'block' : 'none';
     } else {
         statusDiv.style.display = 'none';
         colorPicker.style.display = 'none';
@@ -317,19 +330,22 @@ function updateGameStatus() {
 function updateCurrentGuessUI() {
     const slotsDiv = document.getElementById('guess-slots');
     const submitBtn = document.getElementById('submit-btn');
-    const labels = ['A', 'B', 'C', 'D'];
 
     let html = '';
     for (let i = 0; i < 4; i++) {
         if (currentGuess[i]) {
             const color = COLOR_MAP[currentGuess[i]];
-            html += `<div class="slot-wrapper"><span class="slot-label">${labels[i]}</span><div class="slot filled" style="background-color: ${color};"></div></div>`;
+            html += `<div class="slot-wrapper"><span class="slot-label">${POSITION_LABELS[i]}</span><div class="slot filled" style="background-color: ${color};"></div></div>`;
         } else {
-            html += `<div class="slot-wrapper"><span class="slot-label">${labels[i]}</span><div class="slot empty"></div></div>`;
+            html += `<div class="slot-wrapper"><span class="slot-label">${POSITION_LABELS[i]}</span><div class="slot empty"></div></div>`;
         }
     }
     slotsDiv.innerHTML = html;
     submitBtn.disabled = currentGuess.length !== 4;
+}
+
+function renderColorCircle(color, index) {
+    return `<div class="color-circle-wrapper"><span class="circle-label">${POSITION_LABELS[index]}</span><div class="color-circle" style="background-color: ${COLOR_MAP[color]};"></div></div>`;
 }
 
 function updateGuessHistory() {
@@ -344,7 +360,7 @@ function updateGuessHistory() {
         <div class="guess-row">
             <span class="attempt-number">#${guess.attempt_number}</span>
             <div class="colors">
-                ${guess.colors.map((c, i) => `<div class="color-circle-wrapper"><span class="circle-label">${['A','B','C','D'][i]}</span><div class="color-circle" style="background-color: ${COLOR_MAP[c]};"></div></div>`).join('')}
+                ${guess.colors.map((c, i) => renderColorCircle(c, i)).join('')}
             </div>
             <div class="feedback">${renderFeedback(guess.feedback)}</div>
         </div>
@@ -386,9 +402,7 @@ function updateGameResult() {
         }
 
         if (secretCode) {
-            const colorsHtml = secretCode.map((c, i) =>
-                `<div class="color-circle-wrapper"><span class="circle-label">${['A','B','C','D'][i]}</span><div class="color-circle" style="background-color: ${COLOR_MAP[c]};"></div></div>`
-            ).join('');
+            const colorsHtml = secretCode.map((c, i) => renderColorCircle(c, i)).join('');
             secretEl.innerHTML = `<p>O código secreto era:</p><div class="secret-colors">${colorsHtml}</div>`;
         }
     } else {
@@ -425,6 +439,12 @@ async function loadUserStats() {
 
 // ── Histórico ───────────────────────────────────────────
 
+function getStatusBadge(status) {
+    if (status === 'won') return '✓ Vitória';
+    if (status === 'lost') return '✗ Derrota';
+    return '⏳ Em andamento';
+}
+
 async function loadMyGames() {
     const tableBody = document.getElementById('history-table-body');
 
@@ -439,9 +459,7 @@ async function loadMyGames() {
         tableBody.innerHTML = games.map((game, index) => `
             <tr>
                 <td>${index + 1}</td>
-                <td class="status-${game.status}">
-                    ${game.status === 'won' ? '✓ Vitória' : game.status === 'lost' ? '✗ Derrota' : '⏳ Em andamento'}
-                </td>
+                <td class="status-${game.status}">${getStatusBadge(game.status)}</td>
                 <td>${game.attempts_used} / ${game.max_attempts}</td>
                 <td>${game.score !== null ? game.score : '-'}</td>
                 <td>${formatDuration(game.duration_seconds)}</td>
@@ -453,21 +471,8 @@ async function loadMyGames() {
     }
 }
 
-function formatDate(isoString) {
-    if (!isoString) return '-';
-    return new Date(isoString).toLocaleDateString('pt-BR');
-}
-
 
 // ── Ranking ─────────────────────────────────────────────
-
-function formatDuration(seconds) {
-    if (seconds === null || seconds === undefined) return '-';
-    const min = Math.floor(seconds / 60);
-    const sec = seconds % 60;
-    if (min === 0) return `${sec}s`;
-    return `${min}m ${sec}s`;
-}
 
 async function loadRanking() {
     const tableBody = document.getElementById('ranking-table-body');
@@ -491,7 +496,7 @@ async function loadRanking() {
             <tr>
                 <td>${index + 1}º</td>
                 <td>${game.username}</td>
-                <td class="status-${game.status}">${game.status === 'won' ? '✓ Vitória' : '✗ Derrota'}</td>
+                <td class="status-${game.status}">${getStatusBadge(game.status)}</td>
                 <td>${game.attempts_used} / ${game.max_attempts}</td>
                 <td>${game.score !== null ? game.score : '-'}</td>
                 <td>${formatDuration(game.duration_seconds)}</td>
@@ -532,7 +537,7 @@ function showError(message) {
     const toast = document.getElementById('error-toast');
     document.getElementById('error-message').textContent = message;
     toast.style.display = 'flex';
-    setTimeout(hideError, 5000);
+    setTimeout(hideError, TOAST_DURACAO_ERRO);
 }
 
 function hideError() {
@@ -543,7 +548,7 @@ function showSuccess(message) {
     const toast = document.getElementById('success-toast');
     document.getElementById('success-message').textContent = message;
     toast.style.display = 'flex';
-    setTimeout(hideSuccess, 3000);
+    setTimeout(hideSuccess, TOAST_DURACAO_SUCESSO);
 }
 
 function hideSuccess() {
@@ -560,63 +565,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     showSection(authenticated ? 'dashboard' : 'auth');
 });
 
+function addBlurValidation(inputId, errorId, validate) {
+    const input = document.getElementById(inputId);
+    input.addEventListener('blur', () => {
+        const errorMsg = validate(input);
+        showFieldError(errorId, errorMsg);
+        input.classList.toggle('invalid', errorMsg.length > 0);
+    });
+}
+
 function setupAuthValidation() {
-    const loginUsername = document.getElementById('login-username');
-    const loginPassword = document.getElementById('login-password');
-
-    loginUsername.addEventListener('blur', () => {
-        const value = loginUsername.value.trim();
-        if (value && (value.length < 3 || value.length > 50)) {
-            showFieldError('login-username-error', 'Usuário deve ter entre 3 e 50 caracteres.');
-            loginUsername.classList.add('invalid');
-        } else {
-            showFieldError('login-username-error', '');
-            loginUsername.classList.remove('invalid');
-        }
+    addBlurValidation('login-username', 'login-username-error', (input) => {
+        const value = input.value.trim();
+        return value ? validateUsername(value) : '';
     });
 
-    loginPassword.addEventListener('blur', () => {
-        if (loginPassword.value && loginPassword.value.length < 6) {
-            showFieldError('login-password-error', 'Senha deve ter no mínimo 6 caracteres.');
-            loginPassword.classList.add('invalid');
-        } else {
-            showFieldError('login-password-error', '');
-            loginPassword.classList.remove('invalid');
-        }
+    addBlurValidation('login-password', 'login-password-error', (input) =>
+        input.value ? validatePassword(input.value) : ''
+    );
+
+    addBlurValidation('register-username', 'register-username-error', (input) => {
+        const value = input.value.trim();
+        return value ? validateUsername(value) : '';
     });
 
-    const regUsername = document.getElementById('register-username');
-    const regPassword = document.getElementById('register-password');
-    const regConfirm = document.getElementById('register-password-confirm');
+    addBlurValidation('register-password', 'register-password-error', (input) =>
+        input.value ? validatePassword(input.value) : ''
+    );
 
-    regUsername.addEventListener('blur', () => {
-        const value = regUsername.value.trim();
-        if (value && (value.length < 3 || value.length > 50)) {
-            showFieldError('register-username-error', 'Usuário deve ter entre 3 e 50 caracteres.');
-            regUsername.classList.add('invalid');
-        } else {
-            showFieldError('register-username-error', '');
-            regUsername.classList.remove('invalid');
-        }
-    });
-
-    regPassword.addEventListener('blur', () => {
-        if (regPassword.value && regPassword.value.length < 6) {
-            showFieldError('register-password-error', 'Senha deve ter no mínimo 6 caracteres.');
-            regPassword.classList.add('invalid');
-        } else {
-            showFieldError('register-password-error', '');
-            regPassword.classList.remove('invalid');
-        }
-    });
-
-    regConfirm.addEventListener('blur', () => {
-        if (regConfirm.value && regConfirm.value !== regPassword.value) {
-            showFieldError('register-confirm-error', 'As senhas não conferem.');
-            regConfirm.classList.add('invalid');
-        } else {
-            showFieldError('register-confirm-error', '');
-            regConfirm.classList.remove('invalid');
-        }
-    });
+    addBlurValidation('register-password-confirm', 'register-confirm-error', (input) =>
+        input.value ? validatePasswordConfirm(
+            document.getElementById('register-password').value,
+            input.value
+        ) : ''
+    );
 }

@@ -26,23 +26,23 @@ describe('COLOR_MAP', () => {
     });
 });
 
-describe('formatDurationUtil', () => {
-    it('retorna "-" para null', () => assertEqual(formatDurationUtil(null), '-'));
-    it('retorna "-" para undefined', () => assertEqual(formatDurationUtil(undefined), '-'));
-    it('formata 0 segundos como "0s"', () => assertEqual(formatDurationUtil(0), '0s'));
-    it('formata 45 segundos como "45s"', () => assertEqual(formatDurationUtil(45), '45s'));
-    it('formata 60 segundos como "1m 0s"', () => assertEqual(formatDurationUtil(60), '1m 0s'));
-    it('formata 65 segundos como "1m 5s"', () => assertEqual(formatDurationUtil(65), '1m 5s'));
-    it('formata 3600 segundos como "60m 0s"', () => assertEqual(formatDurationUtil(3600), '60m 0s'));
-    it('formata 125 segundos como "2m 5s"', () => assertEqual(formatDurationUtil(125), '2m 5s'));
+describe('formatDuration', () => {
+    it('retorna "-" para null', () => assertEqual(formatDuration(null), '-'));
+    it('retorna "-" para undefined', () => assertEqual(formatDuration(undefined), '-'));
+    it('formata 0 segundos como "0s"', () => assertEqual(formatDuration(0), '0s'));
+    it('formata 45 segundos como "45s"', () => assertEqual(formatDuration(45), '45s'));
+    it('formata 60 segundos como "1m 0s"', () => assertEqual(formatDuration(60), '1m 0s'));
+    it('formata 65 segundos como "1m 5s"', () => assertEqual(formatDuration(65), '1m 5s'));
+    it('formata 3600 segundos como "60m 0s"', () => assertEqual(formatDuration(3600), '60m 0s'));
+    it('formata 125 segundos como "2m 5s"', () => assertEqual(formatDuration(125), '2m 5s'));
 });
 
-describe('formatDateUtil', () => {
-    it('retorna "-" para null', () => assertEqual(formatDateUtil(null), '-'));
-    it('retorna "-" para string vazia', () => assertEqual(formatDateUtil(''), '-'));
+describe('formatDate', () => {
+    it('retorna "-" para null', () => assertEqual(formatDate(null), '-'));
+    it('retorna "-" para string vazia', () => assertEqual(formatDate(''), '-'));
 
     it('formata data ISO em pt-BR', () => {
-        const result = formatDateUtil('2026-03-22T10:30:00');
+        const result = formatDate('2026-03-22T10:30:00');
         assertTrue(result.includes('22'), `Data deve conter "22", recebeu "${result}"`);
         assertTrue(result.includes('2026'), `Data deve conter "2026", recebeu "${result}"`);
     });

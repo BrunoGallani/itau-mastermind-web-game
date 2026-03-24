@@ -11,127 +11,79 @@ function extractErrorMessage(errorBody, fallback) {
     return errorBody.detail;
 }
 
-async function register(username, password) {
-    const response = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+async function fetchAPI(method, path, { body = null, fallbackError = 'Erro na requisição' } = {}) {
+    const options = {
+        method,
         credentials: 'include',
-        body: JSON.stringify({ username, password }),
-    });
+    };
+
+    if (body !== null) {
+        options.headers = { 'Content-Type': 'application/json' };
+        options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(`${API_URL}${path}`, options);
+
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(extractErrorMessage(error, 'Erro ao registrar'));
+        throw new Error(extractErrorMessage(error, fallbackError));
     }
+
     return response.json();
+}
+
+async function register(username, password) {
+    return fetchAPI('POST', '/auth/register', {
+        body: { username, password },
+        fallbackError: 'Erro ao registrar',
+    });
 }
 
 async function login(username, password) {
-    const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ username, password }),
+    return fetchAPI('POST', '/auth/login', {
+        body: { username, password },
+        fallbackError: 'Erro ao fazer login',
     });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(extractErrorMessage(error, 'Erro ao fazer login'));
-    }
-    return response.json();
 }
 
 async function logout() {
-    const response = await fetch(`${API_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
+    return fetchAPI('POST', '/auth/logout', {
+        fallbackError: 'Erro ao fazer logout',
     });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(extractErrorMessage(error, 'Erro ao fazer logout'));
-    }
-    return response.json();
 }
 
 async function getMe() {
-    const response = await fetch(`${API_URL}/auth/me`, {
-        credentials: 'include',
-    });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(extractErrorMessage(error, 'Erro ao buscar usuário'));
-    }
-    return response.json();
+    return fetchAPI('GET', '/auth/me', { fallbackError: 'Erro ao buscar usuário' });
 }
 
 async function getMeStats() {
-    const response = await fetch(`${API_URL}/auth/me/stats`, {
-        credentials: 'include',
-    });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(extractErrorMessage(error, 'Erro ao buscar estatísticas'));
-    }
-    return response.json();
+    return fetchAPI('GET', '/auth/me/stats', { fallbackError: 'Erro ao buscar estatísticas' });
 }
 
 async function createGame() {
-    const response = await fetch(`${API_URL}/games/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({}),
+    return fetchAPI('POST', '/games/', {
+        body: {},
+        fallbackError: 'Erro ao criar jogo',
     });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(extractErrorMessage(error, 'Erro ao criar jogo'));
-    }
-    return response.json();
 }
 
 async function submitGuess(gameId, colors) {
-    const response = await fetch(`${API_URL}/games/${gameId}/guesses`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ colors }),
+    return fetchAPI('POST', `/games/${gameId}/guesses`, {
+        body: { colors },
+        fallbackError: 'Erro ao enviar tentativa',
     });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(extractErrorMessage(error, 'Erro ao enviar tentativa'));
-    }
-    return response.json();
 }
 
 async function getGameState(gameId) {
-    const response = await fetch(`${API_URL}/games/${gameId}`, {
-        credentials: 'include',
-    });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(extractErrorMessage(error, 'Erro ao buscar jogo'));
-    }
-    return response.json();
+    return fetchAPI('GET', `/games/${gameId}`, { fallbackError: 'Erro ao buscar jogo' });
 }
 
 async function getMyGames() {
-    const response = await fetch(`${API_URL}/games/my-games/`, {
-        credentials: 'include',
-    });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(extractErrorMessage(error, 'Erro ao buscar histórico'));
-    }
-    return response.json();
+    return fetchAPI('GET', '/games/my-games/', { fallbackError: 'Erro ao buscar histórico' });
 }
 
 async function getRanking() {
-    const response = await fetch(`${API_URL}/games/ranking/`, {
-        credentials: 'include',
-    });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(extractErrorMessage(error, 'Erro ao buscar ranking'));
-    }
-    return response.json();
+    return fetchAPI('GET', '/games/ranking/', { fallbackError: 'Erro ao buscar ranking' });
 }
 
 async function healthCheck() {

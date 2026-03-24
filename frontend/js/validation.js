@@ -1,17 +1,24 @@
 // Manter sincronizado com VALID_COLORS no backend (game_logic.py)
 const VALID_COLORS = ['Red', 'Blue', 'Green', 'Yellow', 'Orange', 'Purple'];
 
+const VALIDATION_RULES = {
+    USERNAME_MIN: 3,
+    USERNAME_MAX: 50,
+    PASSWORD_MIN: 6,
+    GUESS_LENGTH: 4,
+};
+
 function validateUsername(value) {
     if (!value || value.trim().length === 0) return 'Usuário é obrigatório.';
     const trimmed = value.trim();
-    if (trimmed.length < 3) return 'Usuário deve ter no mínimo 3 caracteres.';
-    if (trimmed.length > 50) return 'Usuário deve ter no máximo 50 caracteres.';
+    if (trimmed.length < VALIDATION_RULES.USERNAME_MIN) return `Usuário deve ter no mínimo ${VALIDATION_RULES.USERNAME_MIN} caracteres.`;
+    if (trimmed.length > VALIDATION_RULES.USERNAME_MAX) return `Usuário deve ter no máximo ${VALIDATION_RULES.USERNAME_MAX} caracteres.`;
     return '';
 }
 
 function validatePassword(value) {
     if (!value || value.length === 0) return 'Senha é obrigatória.';
-    if (value.length < 6) return 'Senha deve ter no mínimo 6 caracteres.';
+    if (value.length < VALIDATION_RULES.PASSWORD_MIN) return `Senha deve ter no mínimo ${VALIDATION_RULES.PASSWORD_MIN} caracteres.`;
     return '';
 }
 
@@ -23,14 +30,14 @@ function validatePasswordConfirm(password, confirm) {
 
 function validateGuessColors(colors) {
     if (!Array.isArray(colors)) return 'Cores devem ser um array.';
-    if (colors.length !== 4) return 'Selecione exatamente 4 cores.';
+    if (colors.length !== VALIDATION_RULES.GUESS_LENGTH) return `Selecione exatamente ${VALIDATION_RULES.GUESS_LENGTH} cores.`;
     for (const color of colors) {
         if (!VALID_COLORS.includes(color)) return `Cor inválida: ${color}.`;
     }
     return '';
 }
 
-function formatDurationUtil(seconds) {
+function formatDuration(seconds) {
     if (seconds === null || seconds === undefined) return '-';
     const min = Math.floor(seconds / 60);
     const sec = seconds % 60;
@@ -38,7 +45,7 @@ function formatDurationUtil(seconds) {
     return `${min}m ${sec}s`;
 }
 
-function formatDateUtil(isoString) {
+function formatDate(isoString) {
     if (!isoString) return '-';
     return new Date(isoString).toLocaleDateString('pt-BR');
 }
