@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, field_validator
+from app.errors import USERNAME_LENGTH, PASSWORD_LENGTH, GUESS_LENGTH, INVALID_COLOR
 from app.game_logic import VALID_COLORS, CODE_LENGTH
 
 
@@ -10,16 +11,16 @@ class UserCreate(BaseModel):
 
     @field_validator("username")
     @classmethod
-    def validate_username(cls, v):
+    def validate_username(cls, v: str) -> str:
         if len(v) < 3 or len(v) > 50:
-            raise ValueError("Username deve ter entre 3 e 50 caracteres.")
+            raise ValueError(USERNAME_LENGTH)
         return v
 
     @field_validator("password")
     @classmethod
-    def validate_password(cls, v):
+    def validate_password(cls, v: str) -> str:
         if len(v) < 6:
-            raise ValueError("Senha deve ter pelo menos 6 caracteres.")
+            raise ValueError(PASSWORD_LENGTH)
         return v
 
 
@@ -56,12 +57,12 @@ class GuessCreate(BaseModel):
 
     @field_validator("colors")
     @classmethod
-    def validate_colors(cls, v):
+    def validate_colors(cls, v: list[str]) -> list[str]:
         if len(v) != CODE_LENGTH:
-            raise ValueError(f"A tentativa deve conter exatamente {CODE_LENGTH} cores.")
+            raise ValueError(GUESS_LENGTH.format(length=CODE_LENGTH))
         for color in v:
             if color not in VALID_COLORS:
-                raise ValueError(f"Cor inválida: '{color}'. Cores válidas: {VALID_COLORS}")
+                raise ValueError(INVALID_COLOR.format(color=color, valid_colors=VALID_COLORS))
         return v
 
 

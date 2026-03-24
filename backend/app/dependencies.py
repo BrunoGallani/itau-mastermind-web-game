@@ -1,7 +1,9 @@
 from fastapi import Depends, HTTPException, Cookie
 from sqlalchemy.orm import Session
+
 from app.config import utc_now
 from app.database import get_db
+from app.errors import NOT_AUTHENTICATED, INVALID_SESSION
 from app.models import User, Session as SessionModel
 
 
@@ -19,11 +21,11 @@ def get_current_user(
     db: Session = Depends(get_db),
 ) -> User:
     if not session_id:
-        raise HTTPException(status_code=401, detail="Não autenticado.")
+        raise HTTPException(status_code=401, detail=NOT_AUTHENTICATED)
 
     session = _find_valid_session(session_id, db)
     if not session:
-        raise HTTPException(status_code=401, detail="Sessão inválida ou expirada.")
+        raise HTTPException(status_code=401, detail=INVALID_SESSION)
 
     return session.user
 
