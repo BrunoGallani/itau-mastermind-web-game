@@ -4,6 +4,16 @@ VALID_COLORS = ["Red", "Blue", "Green", "Yellow", "Orange", "Purple"]
 CODE_LENGTH = 4
 MAX_ATTEMPTS = 10
 
+BASE_SCORE = 1000
+ATTEMPT_PENALTY = 100
+TIME_DIVISOR = 10
+
+
+class GameStatus:
+    IN_PROGRESS = "in_progress"
+    WON = "won"
+    LOST = "lost"
+
 
 def generate_secret_code() -> list[str]:
     return [random.choice(VALID_COLORS) for _ in range(CODE_LENGTH)]
@@ -31,7 +41,6 @@ def evaluate_guess(secret: list[str], guess: list[str]) -> dict:
 
 
 def calculate_score(attempts_used: int, duration_seconds: int) -> int:
-    base_score = 1000
-    attempt_penalty = (attempts_used - 1) * 100
-    time_penalty = duration_seconds // 10
-    return max(0, base_score - attempt_penalty - time_penalty)
+    attempt_penalty = (attempts_used - 1) * ATTEMPT_PENALTY
+    time_penalty = duration_seconds // TIME_DIVISOR
+    return max(0, BASE_SCORE - attempt_penalty - time_penalty)

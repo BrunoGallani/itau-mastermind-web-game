@@ -2,7 +2,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.config import utc_now
 from app.database import get_db
 from app.models import User
 from app.schemas import (
@@ -16,12 +15,14 @@ from app.schemas import (
     RankingEntryResponse,
 )
 from app.dependencies import get_current_user
+from app.game_logic import GameStatus
 from app.services.game_service import (
     create_game,
     submit_guess,
     get_game_state,
     get_user_games,
     get_ranking,
+    calculate_duration,
 )
 
 router = APIRouter(prefix="/games", tags=["games"])
@@ -70,26 +71,19 @@ def get_my_games(
     db: Session = Depends(get_db),
 ):
     games = get_user_games(user, db)
-    result = []
-    for game in games:
-        duration = None
-        if game.finished_at and game.started_at:
-            duration = int((game.finished_at - game.started_at).total_seconds())
-        elif game.started_at:
-            duration = int((utc_now() - game.started_at).total_seconds())
-        result.append(
-            GameSummaryResponse(
-                game_id=str(game.id),
-                status=game.status,
-                attempts_used=len(game.guesses),
-                max_attempts=game.max_attempts,
-                score=game.score,
-                started_at=game.started_at,
-                finished_at=game.finished_at,
-                duration_seconds=duration,
-            )
+    return [
+        GameSummaryResponse(
+            game_id=str(game.id),
+            status=game.status,
+            attempts_used=len(game.guesses),
+            max_attempts=game.max_attempts,
+            score=game.score,
+            started_at=game.started_at,
+            finished_at=game.finished_at,
+            duration_seconds=calculate_duration(game),
         )
-    return result
+        for game in games
+    ]
 
 
 @router.get("/{game_id}", response_model=GameStateResponse)
@@ -110,14 +104,8 @@ def get_game_state_endpoint(
     ]
 
     secret_code_to_reveal = None
-    if game.status != "in_progress":
+    if game.status != GameStatus.IN_PROGRESS:
         secret_code_to_reveal = game.secret_code
-
-    duration = None
-    if game.finished_at and game.started_at:
-        duration = int((game.finished_at - game.started_at).total_seconds())
-    elif game.started_at:
-        duration = int((utc_now() - game.started_at).total_seconds())
 
     return GameStateResponse(
         game_id=str(game.id),
@@ -126,7 +114,7 @@ def get_game_state_endpoint(
         max_attempts=game.max_attempts,
         started_at=game.started_at,
         finished_at=game.finished_at,
-        duration_seconds=duration,
+        duration_seconds=calculate_duration(game),
         score=game.score,
         guesses=guesses,
         secret_code=secret_code_to_reveal,

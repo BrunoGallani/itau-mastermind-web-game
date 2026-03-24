@@ -3,6 +3,7 @@ from sqlalchemy import Column, String, Integer, ForeignKey, JSON, DateTime, Type
 from sqlalchemy.orm import relationship
 from app.config import utc_now
 from app.database import Base
+from app.game_logic import GameStatus
 
 
 class UUIDString(TypeDecorator):
@@ -49,7 +50,7 @@ class Game(Base):
     id = Column(UUIDString(), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUIDString(), ForeignKey("users.id"), nullable=False)
     secret_code = Column(JSON, nullable=False)
-    status = Column(String, nullable=False, default="in_progress")
+    status = Column(String, nullable=False, default=GameStatus.IN_PROGRESS)
     max_attempts = Column(Integer, nullable=False, default=10)
     started_at = Column(DateTime, default=utc_now)
     finished_at = Column(DateTime, nullable=True)

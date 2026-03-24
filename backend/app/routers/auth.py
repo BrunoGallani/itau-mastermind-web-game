@@ -16,48 +16,32 @@ from app.services.auth_service import (
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
-def register(user_data: UserCreate, response: Response, db: Session = Depends(get_db)):
-    user, session = register_user(user_data.username, user_data.password, db)
-
+def _set_session_cookie(response: Response, session_id) -> None:
     response.set_cookie(
         key="session_id",
-        value=str(session.id),
+        value=str(session_id),
         httponly=True,
         max_age=SESSION_DURATION_HOURS * 3600,
         samesite="lax",
     )
 
-    return AuthResponse(
-        message="Usuário registrado com sucesso!",
-        user=UserResponse(
-            id=str(user.id),
-            username=user.username,
-            created_at=user.created_at,
-        ),
-    )
+
+def _build_user_response(user: User) -> UserResponse:
+    return UserResponse(id=str(user.id), username=user.username, created_at=user.created_at)
+
+
+@router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
+def register(user_data: UserCreate, response: Response, db: Session = Depends(get_db)):
+    user, session = register_user(user_data.username, user_data.password, db)
+    _set_session_cookie(response, session.id)
+    return AuthResponse(message="Usuário registrado com sucesso!", user=_build_user_response(user))
 
 
 @router.post("/login", response_model=AuthResponse)
 def login(user_data: UserLogin, response: Response, db: Session = Depends(get_db)):
     user, session = authenticate_user(user_data.username, user_data.password, db)
-
-    response.set_cookie(
-        key="session_id",
-        value=str(session.id),
-        httponly=True,
-        max_age=SESSION_DURATION_HOURS * 3600,
-        samesite="lax",
-    )
-
-    return AuthResponse(
-        message="Login realizado com sucesso!",
-        user=UserResponse(
-            id=str(user.id),
-            username=user.username,
-            created_at=user.created_at,
-        ),
-    )
+    _set_session_cookie(response, session.id)
+    return AuthResponse(message="Login realizado com sucesso!", user=_build_user_response(user))
 
 
 @router.post("/logout")
@@ -73,11 +57,7 @@ def logout(
 
 @router.get("/me", response_model=UserResponse)
 def get_me(user: User = Depends(get_current_user)):
-    return UserResponse(
-        id=str(user.id),
-        username=user.username,
-        created_at=user.created_at,
-    )
+    return _build_user_response(user)
 
 
 @router.get("/me/stats", response_model=UserStatsResponse)

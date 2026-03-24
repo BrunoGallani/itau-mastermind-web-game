@@ -5,6 +5,7 @@ from fastapi import HTTPException
 
 from app.config import utc_now
 from app.models import User, Session as SessionModel
+from app.game_logic import GameStatus
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SESSION_DURATION_HOURS = 24
@@ -49,12 +50,12 @@ def get_user_stats(user: User, db: Session) -> dict:
     games = db.query(Game).filter(Game.user_id == user.id).all()
 
     total = len(games)
-    wins = sum(1 for g in games if g.status == "won")
-    losses = sum(1 for g in games if g.status == "lost")
-    in_progress = sum(1 for g in games if g.status == "in_progress")
+    wins = sum(1 for g in games if g.status == GameStatus.WON)
+    losses = sum(1 for g in games if g.status == GameStatus.LOST)
+    in_progress = sum(1 for g in games if g.status == GameStatus.IN_PROGRESS)
 
     best_score = None
-    won_games = [g for g in games if g.status == "won" and g.score is not None]
+    won_games = [g for g in games if g.status == GameStatus.WON and g.score is not None]
     if won_games:
         best_score = max(g.score for g in won_games)
 
