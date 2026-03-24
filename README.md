@@ -45,7 +45,7 @@ O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, re
 | Vitória | ![Vitória](docs/screenshots/vitoria.png) |
 | Derrota (código revelado) | ![Derrota](docs/screenshots/derrota.png) |
 
-### Histórico de Partidas
+### Histórico de partidas
 
 ![Histórico](docs/screenshots/historico.png)
 
@@ -85,12 +85,12 @@ O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, re
 
 ## Tech Stack
 
-| Camada   | Tecnologia            | Propósito                                |
-|----------|-----------------------|------------------------------------------|
-| Backend  | Python 3 + FastAPI    | API REST + servidor de arquivos estáticos |
-| Frontend | HTML + CSS + JS puro  | Interface do jogo (sem frameworks)        |
-| Banco    | SQLite                | Persistência (PostgreSQL via env var)     |
-| Testes   | pytest + mini framework JS | Cobertura backend e frontend         |
+| Camada   | Tecnologia                 | Propósito                                  |
+|----------|----------------------------|--------------------------------------------|
+| Backend  | Python 3 + FastAPI         | API REST + servidor de arquivos estáticos  |
+| Frontend | HTML + CSS + JS puro       | Interface do jogo (sem frameworks)         |
+| Banco    | SQLite                     | Persistência local sem dependência externa |
+| Testes   | pytest + mini framework JS | Cobertura backend e frontend               |
 
 ---
 
@@ -127,8 +127,6 @@ Acesse:
 
 - **Jogo**: [http://localhost:8000](http://localhost:8000)
 - **API Docs (Swagger)**: [http://localhost:8000/docs](http://localhost:8000/docs)
-
-> **Importante:** Não abra `frontend/index.html` diretamente no navegador — a autenticação via cookies requer same-origin (servido pelo FastAPI).
 
 ---
 
@@ -237,15 +235,12 @@ mastermind-web-game/
                               └── /games/* ──▶ [game_service] ──▶ [SQLite]
 ```
 
-**Um único processo** FastAPI que serve a API REST e os arquivos estáticos do frontend.
-
 ### Decisões arquiteturais
 
 | Decisão | Motivação |
 |---------|-----------|
 | Frontend vanilla (sem frameworks) | Simplicidade, zero build step, foco no fundamento |
-| SQLite como padrão | Sem dependência externa; PostgreSQL disponível via `DATABASE_URL` |
-| FastAPI serve tudo | Um único processo para API + frontend |
+| SQLite como padrão | Sem dependência externa; para usar PostgreSQL, defina a env var `DATABASE_URL` (ex: `DATABASE_URL=postgresql://user:pass@host/db`) |
 | UUID como ID dos jogos | Impede que IDs sejam adivinhados por incremento |
 | Cookie httponly para sessão | Segurança contra XSS (cookie inacessível via JS) |
 | Código secreto oculto | Só revelado pela API quando o jogo termina |
