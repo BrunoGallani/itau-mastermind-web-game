@@ -55,9 +55,11 @@ describe('formatDateTime', () => {
 
     it('formata data ISO com hora em pt-BR', () => {
         const result = formatDateTime('2026-03-22T10:30:00');
-        assertTrue(result.includes('22'), `Data deve conter "22", recebeu "${result}"`);
-        assertTrue(result.includes('10'), `Data deve conter hora "10", recebeu "${result}"`);
-        assertTrue(result.includes('30'), `Data deve conter minuto "30", recebeu "${result}"`);
+        const expected = new Date('2026-03-22T10:30:00Z').toLocaleString('pt-BR', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit',
+        });
+        assertEqual(result, expected, `Esperava "${expected}", recebeu "${result}"`);
     });
 });
 

@@ -66,6 +66,13 @@
                 html += '<div class="peg white" title="Cor correta, posição errada"></div>';
             return html;
         }
+
+        function getStatusBadge(status) {
+            if (status === 'won') return '✓ Vitória';
+            if (status === 'lost') return '✗ Derrota';
+            if (status === 'abandoned') return '🚫 Abandonado';
+            return '⏳ Em andamento';
+        }
     </script>
 
     <script src="test-utils.js"></script>
