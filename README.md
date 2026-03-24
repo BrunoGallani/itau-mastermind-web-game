@@ -28,24 +28,15 @@ O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, re
 | Login | ![Login](docs/screenshots/login.png) |
 | Cadastro | ![Cadastro](docs/screenshots/register.png) |
 
-<!-- 📸 SCREENSHOT: Tela de login com campos de usuário e senha -->
-<!-- 📸 SCREENSHOT: Tela de cadastro com validação inline dos campos -->
-
 ### Dashboard
 
 ![Dashboard](docs/screenshots/dashboard.png)
-
-<!-- 📸 SCREENSHOT: Dashboard mostrando saudação, estatísticas do usuário, regras e mini-ranking -->
 
 ### Jogo
 
 ![Tela do jogo](docs/screenshots/game.png)
 
-<!-- 📸 SCREENSHOT: Tela do jogo com seletor de cores, tentativa atual e histórico de tentativas -->
-
 ![Demo do jogo](docs/gifs/demo.gif)
-
-<!-- 📸 GIF: Partida completa — seleção de cores, envio, feedback com pinos, até vitória/derrota -->
 
 | Momento | Preview |
 |---------|---------|
@@ -58,13 +49,9 @@ O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, re
 
 ![Histórico](docs/screenshots/historico.png)
 
-<!-- 📸 SCREENSHOT: Tabela de partidas do usuário com status, tentativas, pontuação, duração e datas -->
-
 ### Ranking global
 
 ![Ranking](docs/screenshots/ranking.png)
-
-<!-- 📸 SCREENSHOT: Ranking completo com posição, jogador, status, tentativas, pontuação e duração -->
 
 ### Responsivo (Mobile)
 
@@ -73,15 +60,11 @@ O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, re
 | Dashboard mobile | ![Mobile Dashboard](docs/screenshots/mobile-dashboard.png) |
 | Jogo mobile | ![Mobile Jogo](docs/screenshots/mobile-jogo.png) |
 
-<!-- 📸 SCREENSHOT: Qualquer tela no viewport mobile (~375px) mostrando o layout responsivo -->
-
 ### API (Swagger)
 
 ![Swagger - 1](docs/screenshots/swagger-1.png)
 
 ![Swagger - 2](docs/screenshots/swagger-2.png)
-
-<!-- 📸 SCREENSHOT: Telas do Swagger UI em /docs com os endpoints e schemas expandidos -->
 
 ---
 
@@ -111,7 +94,7 @@ O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, re
 
 ---
 
-## Quick Start
+## Quick start
 
 ### Pré-requisitos
 
@@ -125,11 +108,18 @@ O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, re
 git clone https://github.com/seu-usuario/mastermind-web-game.git
 cd mastermind-web-game
 
-# 2. Instalar dependências
+# 2. Criar ambiente virtual (necessário apenas uma vez)
+python -m venv venv
+
+# 3. Ativar o ambiente virtual
+source venv/bin/activate        # Linux/macOS
+venv\Scripts\activate           # Windows
+
+# 4. Instalar dependências
 cd backend
 pip install -r requirements.txt
 
-# 3. Iniciar o servidor (frontend servido automaticamente)
+# 5. Iniciar o servidor (frontend servido automaticamente)
 uvicorn app.main:app --reload --port 8000
 ```
 
