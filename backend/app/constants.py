@@ -38,6 +38,10 @@ class HttpError(StrEnum):
     INTERNAL_SERVER_ERROR = "Erro interno do servidor."
 
 
+SESSION_COOKIE_KEY = "session_id"
+SECONDS_PER_HOUR = 3600
+
+
 class HttpMeta(StrEnum):
     PROBLEM_TYPE_BLANK = "about:blank"
     PROBLEM_CONTENT_TYPE = "application/problem+json"

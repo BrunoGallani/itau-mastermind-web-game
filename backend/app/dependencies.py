@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.config import utc_now
 from app.database import get_db
-from app.constants import AuthError
+from app.constants import AuthError, SESSION_COOKIE_KEY
 from app.models import User, Session as SessionModel
 
 
@@ -17,7 +17,7 @@ def _find_valid_session(session_id: str, db: Session) -> SessionModel | None:
 
 
 def get_current_user(
-    session_id: str | None = Cookie(default=None),
+    session_id: str | None = Cookie(default=None, alias=SESSION_COOKIE_KEY),
     db: Session = Depends(get_db),
 ) -> User:
     if not session_id:
@@ -31,7 +31,7 @@ def get_current_user(
 
 
 def get_optional_user(
-    session_id: str | None = Cookie(default=None),
+    session_id: str | None = Cookie(default=None, alias=SESSION_COOKIE_KEY),
     db: Session = Depends(get_db),
 ) -> User | None:
     if not session_id:
