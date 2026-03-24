@@ -7,7 +7,7 @@ from fastapi import HTTPException
 
 from app.config import utc_now, settings
 from app.database import persist, save
-from app.errors import USERNAME_EXISTS, INVALID_CREDENTIALS
+from app.constants import AuthError
 from app.models import User, Session as SessionModel, Game
 from app.game_logic import GameStatus
 from app.dto import UserStats
@@ -19,7 +19,7 @@ def register_user(username: str, password: str, db: Session) -> tuple[User, Sess
     """Registra um novo usuário e cria uma sessão."""
     existing = db.query(User).filter(User.username == username).first()
     if existing:
-        raise HTTPException(status_code=400, detail=USERNAME_EXISTS)
+        raise HTTPException(status_code=400, detail=AuthError.USERNAME_EXISTS)
 
     password_hash = pwd_context.hash(password)
     user = User(username=username, password_hash=password_hash)
@@ -33,7 +33,7 @@ def authenticate_user(username: str, password: str, db: Session) -> tuple[User, 
     """Autentica um usuário e cria uma sessão."""
     user = db.query(User).filter(User.username == username).first()
     if not user or not pwd_context.verify(password, user.password_hash):
-        raise HTTPException(status_code=401, detail=INVALID_CREDENTIALS)
+        raise HTTPException(status_code=401, detail=AuthError.INVALID_CREDENTIALS)
 
     session = _create_session(user.id, db)
     return user, session

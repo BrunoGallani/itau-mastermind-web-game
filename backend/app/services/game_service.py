@@ -5,7 +5,7 @@ from fastapi import HTTPException
 
 from app.config import utc_now
 from app.database import persist, save, save_and_refresh
-from app.errors import GAME_NOT_FOUND, GAME_NOT_IN_PROGRESS, GAME_ALREADY_FINISHED
+from app.constants import GameError
 from app.models import Game, Guess, User
 from app.dto import Feedback, GuessResult, RankingEntry
 from app.game_logic import (
@@ -31,7 +31,7 @@ def abandon_stale_games(db: Session) -> int:
 def _get_user_game(game_id: UUID, user: User, db: Session) -> Game:
     game = db.query(Game).filter(Game.id == game_id, Game.user_id == user.id).first()
     if not game:
-        raise HTTPException(status_code=404, detail=GAME_NOT_FOUND)
+        raise HTTPException(status_code=404, detail=GameError.NOT_FOUND)
     return game
 
 
@@ -48,7 +48,7 @@ def abandon_game(game_id: UUID, user: User, db: Session) -> Game:
     if game.status != GameStatus.IN_PROGRESS:
         raise HTTPException(
             status_code=400,
-            detail=GAME_NOT_IN_PROGRESS,
+            detail=GameError.NOT_IN_PROGRESS,
         )
 
     game.status = GameStatus.ABANDONED
@@ -78,7 +78,7 @@ def submit_guess(game_id: UUID, colors: list[str], user: User, db: Session) -> G
     if game.status != GameStatus.IN_PROGRESS:
         raise HTTPException(
             status_code=400,
-            detail=GAME_ALREADY_FINISHED.format(status=game.status),
+            detail=GameError.ALREADY_FINISHED.format(status=game.status),
         )
 
     current_attempt = len(game.guesses) + 1

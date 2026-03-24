@@ -15,6 +15,7 @@ from app.schemas import (
     RankingEntryResponse,
     AbandonResponse,
 )
+from app.constants import GameMessage
 from app.dependencies import get_current_user
 from app.game_logic import GameStatus
 from app.services.game_service import (
@@ -35,7 +36,7 @@ def create_game_endpoint(user: User = Depends(get_current_user), db: Session = D
     game = create_game(user, db)
     return GameCreateResponse(
         game_id=str(game.id),
-        message="Jogo criado! Você tem 10 tentativas. Boa sorte!",
+        message=GameMessage.CREATED,
     )
 
 
@@ -109,7 +110,7 @@ def abandon_game_endpoint(
     return AbandonResponse(
         game_id=str(game.id),
         status=game.status,
-        message="Jogo abandonado.",
+        message=GameMessage.ABANDONED,
         duration_seconds=calculate_duration(game),
         secret_code=game.secret_code,
     )

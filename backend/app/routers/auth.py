@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 from app.config import settings
+from app.constants import AuthMessage
 from app.database import get_db
 from app.models import User
 from app.schemas import UserCreate, UserLogin, UserResponse, AuthResponse, UserStatsResponse
@@ -36,14 +37,14 @@ def _build_user_response(user: User) -> UserResponse:
 def register(user_data: UserCreate, response: Response, db: Session = Depends(get_db)) -> AuthResponse:
     user, session = register_user(user_data.username, user_data.password, db)
     _set_session_cookie(response, session.id)
-    return AuthResponse(message="Usuário registrado com sucesso!", user=_build_user_response(user))
+    return AuthResponse(message=AuthMessage.REGISTER_SUCCESS, user=_build_user_response(user))
 
 
 @router.post("/login", response_model=AuthResponse)
 def login(user_data: UserLogin, response: Response, db: Session = Depends(get_db)) -> AuthResponse:
     user, session = authenticate_user(user_data.username, user_data.password, db)
     _set_session_cookie(response, session.id)
-    return AuthResponse(message="Login realizado com sucesso!", user=_build_user_response(user))
+    return AuthResponse(message=AuthMessage.LOGIN_SUCCESS, user=_build_user_response(user))
 
 
 @router.post("/logout")
@@ -54,7 +55,7 @@ def logout(
 ) -> dict[str, str]:
     logout_user(user, db)
     response.delete_cookie(key="session_id")
-    return {"message": "Logout realizado com sucesso!"}
+    return {"message": AuthMessage.LOGOUT_SUCCESS}
 
 
 @router.get("/me", response_model=UserResponse)
