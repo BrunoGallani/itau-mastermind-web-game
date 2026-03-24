@@ -22,8 +22,8 @@ function it(name, fn) {
     } catch (e) {
         testResults.failed++;
         testResults.errors.push({ group: testResults.currentGroup, test: name, error: e.message });
-        console.error(`  ❌ ${name} — ${e.message}`);
-        if (output) output.innerHTML += `<div class="test-fail">❌ ${name} — <code>${e.message}</code></div>`;
+        console.error(`  ❌ ${name} -${e.message}`);
+        if (output) output.innerHTML += `<div class="test-fail">❌ ${name} -<code>${e.message}</code></div>`;
     }
 }
 
