@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mastermind - Jogo de Quebra de Código</title>
+    <title>Mastermind - Jogo de quebra de código</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -12,11 +12,11 @@
     <!-- NAVBAR - Barra de navegação no topo                          -->
     <!-- ═══════════════════════════════════════════════════════════ -->
     <nav class="navbar">
-        <h1 class="logo">🎯 Mastermind</h1>
+        <h1 class="logo">🧠 Mastermind Web Game</h1>
         <div class="nav-links" id="nav-links" style="display: none;">
             <button onclick="showSection('dashboard')" class="nav-btn">Início</button>
             <button onclick="showSection('game')" class="nav-btn">Jogar</button>
-            <button onclick="showSection('history')" class="nav-btn">Histórico</button>
+            <button onclick="showSection('history')" class="nav-btn">Minhas partidas</button>
             <button onclick="showSection('ranking')" class="nav-btn">Ranking</button>
         </div>
         <div class="nav-user" id="nav-user" style="display: none;">
@@ -75,7 +75,7 @@
                             <span class="field-error" id="register-password-error"></span>
                         </div>
                         <div class="form-group">
-                            <label for="register-password-confirm">Confirmar Senha</label>
+                            <label for="register-password-confirm">Confirmar senha</label>
                             <input type="password" id="register-password-confirm" placeholder="Repita a senha"
                                    required autocomplete="new-password">
                             <span class="field-error" id="register-confirm-error"></span>
@@ -97,7 +97,7 @@
         <section id="dashboard" class="section" style="display: none;">
             <div class="welcome-card">
                 <h2>🎮 Olá, <span id="welcome-username">Jogador</span>!</h2>
-                <p class="subtitle">O clássico jogo de dedução lógica</p>
+                <p class="subtitle">Mastermind: o clássico jogo de dedução lógica</p>
 
                 <!-- Estatísticas do usuário -->
                 <div id="user-stats" class="user-stats-card" style="display: none;">
@@ -116,35 +116,35 @@
                         </div>
                         <div class="stat-box best-score">
                             <span class="stat-value" id="user-best-score">-</span>
-                            <span class="stat-label">Melhor Pontuação</span>
+                            <span class="stat-label">Melhor pontuação</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="rules-box">
-                    <h3>📜 Regras do Jogo</h3>
+                    <h3>📜 Regras do jogo</h3>
                     <ul>
-                        <li><strong>Objetivo:</strong> Descobrir o código secreto de 4 cores.</li>
-                        <li><strong>Tentativas:</strong> Você tem 10 chances para acertar.</li>
-                        <li><strong>Pino Preto ⚫:</strong> Cor certa na posição certa.</li>
-                        <li><strong>Pino Branco ⚪:</strong> Cor certa na posição errada.</li>
-                        <li><strong>Dica:</strong> Use a lógica para eliminar possibilidades!</li>
+                        <li><strong>Objetivo:</strong> descobrir o código secreto de 4 cores.</li>
+                        <li><strong>Tentativas:</strong> você tem 10 chances para acertar.</li>
+                        <li><strong>Pino preto ⚫:</strong> cor certa na posição certa.</li>
+                        <li><strong>Pino branco ⚪:</strong> cor certa na posição errada.</li>
+                        <li><strong>Dica:</strong> use a lógica para eliminar possibilidades!</li>
                     </ul>
                 </div>
 
                 <button onclick="startNewGame()" class="btn btn-primary btn-large">
-                    🚀 Iniciar Novo Jogo
+                    🚀 Iniciar novo jogo
                 </button>
             </div>
 
             <!-- Mini-ranking na dashboard -->
             <div class="mini-ranking">
-                <h3>🏆 Últimas Partidas</h3>
+                <h3>🏆 Ranking de jogadores</h3>
                 <div id="mini-ranking-list" class="ranking-list">
                     <p class="loading">Carregando...</p>
                 </div>
                 <button onclick="showSection('ranking')" class="btn btn-secondary">
-                    Ver Ranking Completo →
+                    Ver ranking completo →
                 </button>
             </div>
         </section>
@@ -156,7 +156,7 @@
             <div class="game-container">
                 <!-- Status do jogo -->
                 <div id="game-status" class="game-status">
-                    <p>Clique em "Iniciar Novo Jogo" na tela inicial para começar.</p>
+                    <p>Clique em "Iniciar novo jogo" na tela inicial para começar.</p>
                 </div>
 
                 <!-- Timer do jogo -->
@@ -194,8 +194,8 @@
                 </div>
 
                 <!-- Histórico de tentativas -->
-                <div id="guesses-history" class="guesses-history">
-                    <h3>📝 Histórico de Tentativas</h3>
+                <div id="guesses-history" class="guesses-history" style="display: none;">
+                    <h3>📝 Tentativas desta rodada</h3>
                     <div id="guesses-list" class="guesses-list">
                         <p class="empty-message">Nenhuma tentativa ainda.</p>
                     </div>
@@ -208,7 +208,7 @@
                     <p id="result-score" class="result-score"></p>
                     <div id="secret-code-reveal" class="secret-code-reveal"></div>
                     <button onclick="startNewGame()" class="btn btn-primary btn-large">
-                        🔄 Jogar Novamente
+                        🔄 Jogar novamente
                     </button>
                 </div>
             </div>
@@ -219,7 +219,8 @@
         <!-- ═══════════════════════════════════════════════════════════ -->
         <section id="history" class="section" style="display: none;">
             <div class="ranking-container">
-                <h2>📋 Minhas Partidas</h2>
+                <h2>📋 Minhas partidas</h2>
+                <p class="section-subtitle">Todas as suas partidas jogadas, incluindo vitórias, derrotas e abandonos.</p>
 
                 <div class="ranking-table-container">
                     <table class="ranking-table">
@@ -243,7 +244,7 @@
                 </div>
 
                 <button onclick="showSection('dashboard')" class="btn btn-secondary">
-                    ← Voltar ao Início
+                    ← Voltar ao início
                 </button>
             </div>
         </section>
@@ -253,12 +254,13 @@
         <!-- ═══════════════════════════════════════════════════════════ -->
         <section id="ranking" class="section" style="display: none;">
             <div class="ranking-container">
-                <h2>🏆 Ranking de Partidas</h2>
+                <h2>🏆 Ranking de jogadores</h2>
+                <p class="section-subtitle">Todas as partidas finalizadas de todos os jogadores, ordenadas por pontuação.</p>
 
                 <div class="stats-summary" id="stats-summary">
                     <div class="stat-box">
                         <span class="stat-value" id="total-games">0</span>
-                        <span class="stat-label">Total de Jogos</span>
+                        <span class="stat-label">Total de jogos</span>
                     </div>
                     <div class="stat-box wins">
                         <span class="stat-value" id="total-wins">0</span>
@@ -271,7 +273,7 @@
                 </div>
 
                 <div id="ranking-table-container" class="ranking-table-container">
-                    <table class="ranking-table">
+                    <table class="ranking-table ranking-table-global">
                         <thead>
                             <tr>
                                 <th>Posição</th>
@@ -291,7 +293,7 @@
                 </div>
 
                 <button onclick="showSection('dashboard')" class="btn btn-secondary">
-                    ← Voltar ao Início
+                    ← Voltar ao início
                 </button>
             </div>
         </section>
@@ -310,7 +312,7 @@
     </div>
 
     <footer class="footer">
-        <p>Mastermind Game — Case Técnico Itaú | Feito com ❤️ em Python + JavaScript</p>
+        <p>Mastermind Web Game - Case Técnico Itaú | Feito com ❤️ em Python + JavaScript</p>
     </footer>
 
     <!-- Scripts -->

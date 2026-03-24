@@ -245,8 +245,8 @@ async function startNewGame() {
         gameScore = null;
 
         startTimer();
-        updateGameUI();
         showSection('game');
+        updateGameUI();
     } catch (error) {
         showError('Erro ao criar jogo: ' + error.message);
     }
@@ -318,6 +318,9 @@ function updateGameUI() {
     updateCurrentGuessUI();
     updateGuessHistory();
     updateGameResult();
+
+    document.getElementById('guesses-history').style.display =
+        gameStatus === 'idle' ? 'none' : 'block';
 }
 
 function updateGameStatus() {
@@ -422,7 +425,7 @@ function updateGameResult() {
             messageEl.textContent = `Você descobriu o código em ${guessHistory.length} tentativa(s)!`;
             scoreEl.textContent = `Pontuação: ${gameScore !== null ? gameScore : 0} pontos`;
         } else if (gameStatus === 'abandoned') {
-            titleEl.textContent = '🚫 Jogo Abandonado';
+            titleEl.textContent = '🚫 Jogo abandonado';
             messageEl.textContent = 'Você abandonou esta partida.';
             scoreEl.textContent = 'Pontuação: 0 pontos';
         } else {

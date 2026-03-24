@@ -672,7 +672,14 @@ h1, h2, h3 {
 
 .ranking-container h2 {
     text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    text-align: center;
+    color: var(--text-muted);
     margin-bottom: 1.5rem;
+    font-size: 0.95rem;
 }
 
 .stats-summary {
@@ -735,6 +742,10 @@ h1, h2, h3 {
 .ranking-table th {
     background: var(--secondary-color);
     color: white;
+}
+
+.ranking-table-global th {
+    background: var(--primary-color);
 }
 
 .ranking-table tbody tr:hover {
