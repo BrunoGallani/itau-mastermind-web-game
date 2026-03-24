@@ -48,6 +48,34 @@ describe('formatDate', () => {
     });
 });
 
+describe('formatDateTime', () => {
+    it('retorna "-" para null', () => assertEqual(formatDateTime(null), '-'));
+    it('retorna "-" para string vazia', () => assertEqual(formatDateTime(''), '-'));
+    it('retorna "-" para undefined', () => assertEqual(formatDateTime(undefined), '-'));
+
+    it('formata data ISO com hora em pt-BR', () => {
+        const result = formatDateTime('2026-03-22T10:30:00');
+        assertTrue(result.includes('22'), `Data deve conter "22", recebeu "${result}"`);
+        assertTrue(result.includes('10'), `Data deve conter hora "10", recebeu "${result}"`);
+        assertTrue(result.includes('30'), `Data deve conter minuto "30", recebeu "${result}"`);
+    });
+});
+
+describe('getStatusBadge', () => {
+    it('retorna badge de vitória para "won"', () => {
+        assertTrue(getStatusBadge('won').includes('Vitória'));
+    });
+    it('retorna badge de derrota para "lost"', () => {
+        assertTrue(getStatusBadge('lost').includes('Derrota'));
+    });
+    it('retorna badge de abandonado para "abandoned"', () => {
+        assertTrue(getStatusBadge('abandoned').includes('Abandonado'));
+    });
+    it('retorna badge de em andamento para "in_progress"', () => {
+        assertTrue(getStatusBadge('in_progress').includes('Em andamento'));
+    });
+});
+
 describe('renderFeedback', () => {
     it('renderiza 4 pinos pretos para acerto total', () => {
         const html = renderFeedback({ black_pegs: 4, white_pegs: 0 });

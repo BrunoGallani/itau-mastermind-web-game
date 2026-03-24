@@ -217,6 +217,82 @@ def test_my_games_unauthenticated(unauthenticated_client):
     assert resp.status_code == 401
 
 
+def test_abandon_game(client):
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+
+    resp = client.post(f"/games/{game_id}/abandon")
+    assert resp.status_code == 200
+
+    data = resp.json()
+    assert data["status"] == "abandoned"
+    assert data["game_id"] == game_id
+    assert data["secret_code"] is not None
+    assert len(data["secret_code"]) == 4
+    assert data["duration_seconds"] is not None
+
+
+def test_abandon_finished_game_fails(client):
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+
+    for _ in range(10):
+        resp = client.post(
+            f"/games/{game_id}/guesses",
+            json={"colors": ["Red", "Red", "Red", "Red"]},
+        )
+        if resp.json()["status"] != "in_progress":
+            break
+
+    resp = client.post(f"/games/{game_id}/abandon")
+    assert resp.status_code == 400
+
+
+def test_cannot_guess_after_abandon(client):
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+
+    client.post(f"/games/{game_id}/abandon")
+
+    resp = client.post(
+        f"/games/{game_id}/guesses",
+        json={"colors": ["Red", "Blue", "Green", "Yellow"]},
+    )
+    assert resp.status_code == 400
+
+
+def test_abandoned_game_not_in_ranking(client):
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+
+    client.post(f"/games/{game_id}/abandon")
+
+    ranking_resp = client.get("/games/ranking/")
+    game_ids = [entry["game_id"] for entry in ranking_resp.json()]
+    assert game_id not in game_ids
+
+
+def test_in_progress_game_has_null_duration(client):
+    client.post("/games/")
+
+    resp = client.get("/games/my-games/")
+    data = resp.json()
+    assert len(data) == 1
+    assert data[0]["duration_seconds"] is None
+
+
+def test_abandoned_game_reveals_secret_code(client):
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+
+    client.post(f"/games/{game_id}/abandon")
+
+    state_resp = client.get(f"/games/{game_id}")
+    data = state_resp.json()
+    assert data["status"] == "abandoned"
+    assert data["secret_code"] is not None
+
+
 def test_my_games_shows_finished_game_score(client):
     create_resp = client.post("/games/")
     game_id = create_resp.json()["game_id"]

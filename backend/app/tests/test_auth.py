@@ -95,7 +95,21 @@ def test_get_stats_no_games(client):
     assert data["wins"] == 0
     assert data["losses"] == 0
     assert data["in_progress"] == 0
+    assert data["abandoned"] == 0
     assert data["best_score"] is None
+
+
+def test_get_stats_with_abandoned_game(client):
+    create_resp = client.post("/games/")
+    game_id = create_resp.json()["game_id"]
+    client.post(f"/games/{game_id}/abandon")
+
+    response = client.get("/auth/me/stats")
+    data = response.json()
+    assert data["total_games"] == 1
+    assert data["abandoned"] == 1
+    assert data["wins"] == 0
+    assert data["losses"] == 0
 
 
 def test_get_stats_with_games(client):
