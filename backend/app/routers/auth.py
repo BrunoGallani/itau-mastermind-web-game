@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.constants import AuthMessage
+from app.constants import AuthMessage, SESSION_COOKIE_KEY, SECONDS_PER_HOUR
 from app.database import get_db
 from app.models import User
 from app.schemas import UserCreate, UserLogin, UserResponse, AuthResponse, MessageResponse, UserStatsResponse
@@ -21,10 +21,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 def _set_session_cookie(response: Response, session_id: UUID) -> None:
     response.set_cookie(
-        key="session_id",
+        key=SESSION_COOKIE_KEY,
         value=str(session_id),
         httponly=settings.cookie_httponly,
-        max_age=settings.session_duration_hours * 3600,
+        max_age=settings.session_duration_hours * SECONDS_PER_HOUR,
         samesite=settings.cookie_samesite,
     )
 
@@ -54,7 +54,7 @@ def logout(
     db: Session = Depends(get_db),
 ) -> MessageResponse:
     logout_user(user, db)
-    response.delete_cookie(key="session_id")
+    response.delete_cookie(key=SESSION_COOKIE_KEY)
     return MessageResponse(message=AuthMessage.LOGOUT_SUCCESS)
 
 
