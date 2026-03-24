@@ -9,7 +9,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.exceptions import RequestValidationError
 from app.config import settings
 from app.database import engine, Base, SessionLocal
-from app.errors import INTERNAL_SERVER_ERROR
+from app.constants import HttpError, HttpMeta, STATUS_TITLES
 from app.routers import game, auth
 from app.services.game_service import abandon_stale_games
 import app.models  # noqa: F401
@@ -45,18 +45,8 @@ app.add_middleware(
     allow_headers=settings.cors_allow_headers,
 )
 
-_STATUS_TITLES: dict[int, str] = {
-    400: "Requisição Inválida",
-    401: "Não Autenticado",
-    403: "Acesso Negado",
-    404: "Não Encontrado",
-    422: "Erro de Validação",
-    500: "Erro Interno",
-}
-
-
 def _status_title(code: int) -> str:
-    return _STATUS_TITLES.get(code, "Erro")
+    return STATUS_TITLES.get(code, HttpMeta.STATUS_TITLE_DEFAULT)
 
 
 @app.exception_handler(RequestValidationError)
@@ -68,13 +58,13 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     return JSONResponse(
         status_code=422,
         content={
-            "type": "about:blank",
+            "type": HttpMeta.PROBLEM_TYPE_BLANK,
             "title": _status_title(422),
             "status": 422,
             "detail": errors,
             "instance": str(request.url.path),
         },
-        media_type="application/problem+json",
+        media_type=HttpMeta.PROBLEM_CONTENT_TYPE,
     )
 
 
@@ -83,13 +73,13 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     return JSONResponse(
         status_code=exc.status_code,
         content={
-            "type": "about:blank",
+            "type": HttpMeta.PROBLEM_TYPE_BLANK,
             "title": _status_title(exc.status_code),
             "status": exc.status_code,
             "detail": exc.detail,
             "instance": str(request.url.path),
         },
-        media_type="application/problem+json",
+        media_type=HttpMeta.PROBLEM_CONTENT_TYPE,
     )
 
 
@@ -98,13 +88,13 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
     return JSONResponse(
         status_code=500,
         content={
-            "type": "about:blank",
+            "type": HttpMeta.PROBLEM_TYPE_BLANK,
             "title": _status_title(500),
             "status": 500,
-            "detail": INTERNAL_SERVER_ERROR,
+            "detail": HttpError.INTERNAL_SERVER_ERROR,
             "instance": str(request.url.path),
         },
-        media_type="application/problem+json",
+        media_type=HttpMeta.PROBLEM_CONTENT_TYPE,
     )
 
 

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.config import utc_now
 from app.database import get_db
-from app.errors import NOT_AUTHENTICATED, INVALID_SESSION
+from app.constants import AuthError
 from app.models import User, Session as SessionModel
 
 
@@ -21,11 +21,11 @@ def get_current_user(
     db: Session = Depends(get_db),
 ) -> User:
     if not session_id:
-        raise HTTPException(status_code=401, detail=NOT_AUTHENTICATED)
+        raise HTTPException(status_code=401, detail=AuthError.NOT_AUTHENTICATED)
 
     session = _find_valid_session(session_id, db)
     if not session:
-        raise HTTPException(status_code=401, detail=INVALID_SESSION)
+        raise HTTPException(status_code=401, detail=AuthError.INVALID_SESSION)
 
     return session.user
 
