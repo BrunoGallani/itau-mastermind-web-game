@@ -168,12 +168,12 @@
                 <div id="color-picker" class="color-picker" style="display: none;">
                     <h3>Escolha uma cor:</h3>
                     <div class="color-options">
-                        <button class="color-btn" data-color="Red" style="background-color: #e74c3c;" onclick="selectColor('Red')"></button>
-                        <button class="color-btn" data-color="Blue" style="background-color: #3498db;" onclick="selectColor('Blue')"></button>
-                        <button class="color-btn" data-color="Green" style="background-color: #27ae60;" onclick="selectColor('Green')"></button>
-                        <button class="color-btn" data-color="Yellow" style="background-color: #f1c40f;" onclick="selectColor('Yellow')"></button>
-                        <button class="color-btn" data-color="Orange" style="background-color: #e67e22;" onclick="selectColor('Orange')"></button>
-                        <button class="color-btn" data-color="Purple" style="background-color: #9b59b6;" onclick="selectColor('Purple')"></button>
+                        <button class="color-btn" data-color="Red" aria-label="Selecionar cor Vermelha" onclick="selectColor('Red')"></button>
+                        <button class="color-btn" data-color="Blue" aria-label="Selecionar cor Azul" onclick="selectColor('Blue')"></button>
+                        <button class="color-btn" data-color="Green" aria-label="Selecionar cor Verde" onclick="selectColor('Green')"></button>
+                        <button class="color-btn" data-color="Yellow" aria-label="Selecionar cor Amarela" onclick="selectColor('Yellow')"></button>
+                        <button class="color-btn" data-color="Orange" aria-label="Selecionar cor Laranja" onclick="selectColor('Orange')"></button>
+                        <button class="color-btn" data-color="Purple" aria-label="Selecionar cor Roxa" onclick="selectColor('Purple')"></button>
                     </div>
                 </div>
 
@@ -299,13 +299,13 @@
     <!-- Mensagem de erro global -->
     <div id="error-toast" class="toast error-toast" style="display: none;">
         <span id="error-message"></span>
-        <button onclick="hideError()" class="close-btn">×</button>
+        <button onclick="hideError()" class="close-btn" aria-label="Fechar notificação">×</button>
     </div>
 
     <!-- Mensagem de sucesso global -->
     <div id="success-toast" class="toast success-toast" style="display: none;">
         <span id="success-message"></span>
-        <button onclick="hideSuccess()" class="close-btn">×</button>
+        <button onclick="hideSuccess()" class="close-btn" aria-label="Fechar notificação">×</button>
     </div>
 
     <footer class="footer">

@@ -93,6 +93,11 @@ h1, h2, h3 {
     border-color: var(--primary-color);
 }
 
+.nav-btn:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
 .container {
     flex: 1;
     max-width: 1000px;
@@ -133,6 +138,11 @@ h1, h2, h3 {
 .btn-primary:hover:not(:disabled) {
     background: var(--primary-dark);
     transform: translateY(-2px);
+}
+
+.btn:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
 }
 
 .btn-primary:disabled {
@@ -406,9 +416,21 @@ h1, h2, h3 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.color-btn[data-color="Red"]    { background-color: var(--color-red); }
+.color-btn[data-color="Blue"]   { background-color: var(--color-blue); }
+.color-btn[data-color="Green"]  { background-color: var(--color-green); }
+.color-btn[data-color="Yellow"] { background-color: var(--color-yellow); }
+.color-btn[data-color="Orange"] { background-color: var(--color-orange); }
+.color-btn[data-color="Purple"] { background-color: var(--color-purple); }
+
 .color-btn:hover {
     transform: scale(1.1);
     border-color: var(--secondary-color);
+}
+
+.color-btn:focus-visible {
+    outline: 3px solid var(--secondary-color);
+    outline-offset: 2px;
 }
 
 .current-guess {
