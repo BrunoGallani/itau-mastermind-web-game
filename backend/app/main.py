@@ -81,6 +81,7 @@ def health_check():
 if FRONTEND_DIR.exists():
     app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="css")
     app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="js")
+    app.mount("/tests", StaticFiles(directory=FRONTEND_DIR / "tests"), name="tests")
 
     @app.get("/favicon.svg")
     async def serve_favicon():
