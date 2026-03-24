@@ -14,14 +14,14 @@
     <nav class="navbar">
         <h1 class="logo">🧠 Mastermind Web Game</h1>
         <div class="nav-links" id="nav-links" style="display: none;">
-            <button onclick="showSection('dashboard')" class="nav-btn">Início</button>
-            <button onclick="showSection('game')" class="nav-btn">Jogar</button>
-            <button onclick="showSection('history')" class="nav-btn">Minhas partidas</button>
-            <button onclick="showSection('ranking')" class="nav-btn">Ranking</button>
+            <button type="button" onclick="showSection('dashboard')" class="nav-btn">Início</button>
+            <button type="button" onclick="showSection('game')" class="nav-btn">Jogar</button>
+            <button type="button" onclick="showSection('history')" class="nav-btn">Minhas partidas</button>
+            <button type="button" onclick="showSection('ranking')" class="nav-btn">Ranking</button>
         </div>
         <div class="nav-user" id="nav-user" style="display: none;">
             <span id="nav-username"></span>
-            <button onclick="handleLogout()" class="nav-btn nav-btn-logout">Sair</button>
+            <button type="button" onclick="handleLogout()" class="nav-btn nav-btn-logout">Sair</button>
         </div>
     </nav>
 
@@ -132,7 +132,7 @@
                     </ul>
                 </div>
 
-                <button onclick="startNewGame()" class="btn btn-primary btn-large">
+                <button type="button" onclick="startNewGame()" class="btn btn-primary btn-large">
                     🚀 Iniciar novo jogo
                 </button>
             </div>
@@ -143,7 +143,7 @@
                 <div id="mini-ranking-list" class="ranking-list">
                     <p class="loading">Carregando...</p>
                 </div>
-                <button onclick="showSection('ranking')" class="btn btn-secondary">
+                <button type="button" onclick="showSection('ranking')" class="btn btn-secondary">
                     Ver ranking completo >
                 </button>
             </div>
@@ -168,12 +168,12 @@
                 <div id="color-picker" class="color-picker" style="display: none;">
                     <h3>Escolha uma cor:</h3>
                     <div class="color-options">
-                        <button class="color-btn" data-color="Red" aria-label="Selecionar cor Vermelha" onclick="selectColor('Red')"></button>
-                        <button class="color-btn" data-color="Blue" aria-label="Selecionar cor Azul" onclick="selectColor('Blue')"></button>
-                        <button class="color-btn" data-color="Green" aria-label="Selecionar cor Verde" onclick="selectColor('Green')"></button>
-                        <button class="color-btn" data-color="Yellow" aria-label="Selecionar cor Amarela" onclick="selectColor('Yellow')"></button>
-                        <button class="color-btn" data-color="Orange" aria-label="Selecionar cor Laranja" onclick="selectColor('Orange')"></button>
-                        <button class="color-btn" data-color="Purple" aria-label="Selecionar cor Roxa" onclick="selectColor('Purple')"></button>
+                        <button type="button" class="color-btn" data-color="Red" aria-label="Selecionar cor Vermelha" onclick="selectColor('Red')"></button>
+                        <button type="button" class="color-btn" data-color="Blue" aria-label="Selecionar cor Azul" onclick="selectColor('Blue')"></button>
+                        <button type="button" class="color-btn" data-color="Green" aria-label="Selecionar cor Verde" onclick="selectColor('Green')"></button>
+                        <button type="button" class="color-btn" data-color="Yellow" aria-label="Selecionar cor Amarela" onclick="selectColor('Yellow')"></button>
+                        <button type="button" class="color-btn" data-color="Orange" aria-label="Selecionar cor Laranja" onclick="selectColor('Orange')"></button>
+                        <button type="button" class="color-btn" data-color="Purple" aria-label="Selecionar cor Roxa" onclick="selectColor('Purple')"></button>
                     </div>
                 </div>
 
@@ -187,9 +187,9 @@
                         <div class="slot-wrapper"><span class="slot-label">D</span><div class="slot empty"></div></div>
                     </div>
                     <div class="guess-actions">
-                        <button onclick="removeLastColor()" class="btn btn-secondary">← Remover</button>
-                        <button onclick="clearCurrentGuess()" class="btn btn-secondary">Limpar</button>
-                        <button onclick="sendGuess()" id="submit-btn" class="btn btn-primary" disabled>Enviar ✓</button>
+                        <button type="button" onclick="removeLastColor()" class="btn btn-secondary">← Remover</button>
+                        <button type="button" onclick="clearCurrentGuess()" class="btn btn-secondary">Limpar</button>
+                        <button type="button" onclick="sendGuess()" id="submit-btn" class="btn btn-primary" disabled>Enviar ✓</button>
                     </div>
                 </div>
 
@@ -207,7 +207,7 @@
                     <p id="result-message"></p>
                     <p id="result-score" class="result-score"></p>
                     <div id="secret-code-reveal" class="secret-code-reveal"></div>
-                    <button onclick="startNewGame()" class="btn btn-primary btn-large">
+                    <button type="button" onclick="startNewGame()" class="btn btn-primary btn-large">
                         🔄 Jogar novamente
                     </button>
                 </div>
@@ -243,7 +243,7 @@
                     </table>
                 </div>
 
-                <button onclick="showSection('dashboard')" class="btn btn-secondary">
+                <button type="button" onclick="showSection('dashboard')" class="btn btn-secondary">
                     ← Voltar ao início
                 </button>
             </div>
@@ -292,7 +292,7 @@
                     </table>
                 </div>
 
-                <button onclick="showSection('dashboard')" class="btn btn-secondary">
+                <button type="button" onclick="showSection('dashboard')" class="btn btn-secondary">
                     ← Voltar ao início
                 </button>
             </div>
@@ -302,13 +302,13 @@
     <!-- Mensagem de erro global -->
     <div id="error-toast" class="toast error-toast" style="display: none;">
         <span id="error-message"></span>
-        <button onclick="hideError()" class="close-btn" aria-label="Fechar notificação">×</button>
+        <button type="button" onclick="hideError()" class="close-btn" aria-label="Fechar notificação">×</button>
     </div>
 
     <!-- Mensagem de sucesso global -->
     <div id="success-toast" class="toast success-toast" style="display: none;">
         <span id="success-message"></span>
-        <button onclick="hideSuccess()" class="close-btn" aria-label="Fechar notificação">×</button>
+        <button type="button" onclick="hideSuccess()" class="close-btn" aria-label="Fechar notificação">×</button>
     </div>
 
     <footer class="footer">
