@@ -226,6 +226,14 @@ function showSection(sectionId) {
 
 async function startNewGame() {
     try {
+        const games = await getMyGames();
+        const inProgressGame = games.find(g => g.status === 'in_progress');
+
+        if (inProgressGame) {
+            if (!confirm('Você tem um jogo em andamento. Deseja abandoná-lo e iniciar um novo?')) return;
+            await abandonGame(inProgressGame.game_id);
+        }
+
         const response = await createGame();
 
         gameId = response.game_id;
@@ -241,6 +249,23 @@ async function startNewGame() {
         showSection('game');
     } catch (error) {
         showError('Erro ao criar jogo: ' + error.message);
+    }
+}
+
+async function handleAbandonGame() {
+    if (!gameId || gameStatus !== 'in_progress') return;
+    if (!confirm('Tem certeza que deseja abandonar o jogo? Você perderá a partida.')) return;
+
+    try {
+        const response = await abandonGame(gameId);
+        gameStatus = response.status;
+        secretCode = response.secret_code;
+        gameScore = 0;
+        stopTimer();
+        updateGameUI();
+        showSuccess('Jogo abandonado.');
+    } catch (error) {
+        showError('Erro ao abandonar jogo: ' + error.message);
     }
 }
 
@@ -307,7 +332,8 @@ function updateGameStatus() {
             showPicker: false,
         },
         in_progress: {
-            html: `<p><strong>Jogo em andamento!</strong> Tentativas restantes: <strong>${attemptsLeft}</strong></p>`,
+            html: `<p><strong>Jogo em andamento!</strong> Tentativas restantes: <strong>${attemptsLeft}</strong></p>
+                   <button onclick="handleAbandonGame()" class="btn btn-danger btn-small">Abandonar Jogo</button>`,
             className: 'game-status in-progress',
             showPicker: true,
         },
@@ -386,7 +412,7 @@ function updateGameResult() {
     const secretEl = document.getElementById('secret-code-reveal');
     const timerDiv = document.getElementById('game-timer');
 
-    if (gameStatus === 'won' || gameStatus === 'lost') {
+    if (gameStatus === 'won' || gameStatus === 'lost' || gameStatus === 'abandoned') {
         resultDiv.style.display = 'block';
         resultDiv.className = `game-result ${gameStatus}`;
         timerDiv.style.display = 'none';
@@ -395,6 +421,10 @@ function updateGameResult() {
             titleEl.textContent = '🎉 Parabéns! Você venceu!';
             messageEl.textContent = `Você descobriu o código em ${guessHistory.length} tentativa(s)!`;
             scoreEl.textContent = `Pontuação: ${gameScore !== null ? gameScore : 0} pontos`;
+        } else if (gameStatus === 'abandoned') {
+            titleEl.textContent = '🚫 Jogo Abandonado';
+            messageEl.textContent = 'Você abandonou esta partida.';
+            scoreEl.textContent = 'Pontuação: 0 pontos';
         } else {
             titleEl.textContent = '😔 Que pena! Você perdeu.';
             messageEl.textContent = 'Não se preocupe, tente novamente!';
@@ -442,6 +472,7 @@ async function loadUserStats() {
 function getStatusBadge(status) {
     if (status === 'won') return '✓ Vitória';
     if (status === 'lost') return '✗ Derrota';
+    if (status === 'abandoned') return '🚫 Abandonado';
     return '⏳ Em andamento';
 }
 
@@ -452,7 +483,7 @@ async function loadMyGames() {
         const games = await getMyGames();
 
         if (games.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="6" class="empty-message">Você ainda não jogou nenhuma partida.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="7" class="empty-message">Você ainda não jogou nenhuma partida.</td></tr>';
             return;
         }
 
@@ -463,11 +494,12 @@ async function loadMyGames() {
                 <td>${game.attempts_used} / ${game.max_attempts}</td>
                 <td>${game.score !== null ? game.score : '-'}</td>
                 <td>${formatDuration(game.duration_seconds)}</td>
-                <td>${formatDate(game.started_at)}</td>
+                <td>${formatDateTime(game.started_at)}</td>
+                <td>${formatDateTime(game.finished_at)}</td>
             </tr>
         `).join('');
     } catch (error) {
-        tableBody.innerHTML = `<tr><td colspan="6" class="error">Erro ao carregar histórico: ${error.message}</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" class="error">Erro ao carregar histórico: ${error.message}</td></tr>`;
     }
 }
 

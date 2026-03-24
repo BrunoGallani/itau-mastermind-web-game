@@ -74,6 +74,13 @@ async function submitGuess(gameId, colors) {
     });
 }
 
+async function abandonGame(gameId) {
+    return fetchAPI('POST', `/games/${gameId}/abandon`, {
+        body: {},
+        fallbackError: 'Erro ao abandonar jogo',
+    });
+}
+
 async function getGameState(gameId) {
     return fetchAPI('GET', `/games/${gameId}`, { fallbackError: 'Erro ao buscar jogo' });
 }

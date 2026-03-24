@@ -45,7 +45,23 @@ function formatDuration(seconds) {
     return `${min}m ${sec}s`;
 }
 
+function ensureUTC(isoString) {
+    if (!isoString) return isoString;
+    return isoString.endsWith('Z') ? isoString : isoString + 'Z';
+}
+
 function formatDate(isoString) {
     if (!isoString) return '-';
-    return new Date(isoString).toLocaleDateString('pt-BR');
+    return new Date(ensureUTC(isoString)).toLocaleDateString('pt-BR');
+}
+
+function formatDateTime(isoString) {
+    if (!isoString) return '-';
+    return new Date(ensureUTC(isoString)).toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
 }

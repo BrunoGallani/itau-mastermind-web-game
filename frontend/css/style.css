@@ -159,6 +159,20 @@ h1, h2, h3 {
     background: #bdc3c7;
 }
 
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
 .btn-large {
     padding: 1rem 2rem;
     font-size: 1.2rem;
@@ -612,6 +626,10 @@ h1, h2, h3 {
     background: rgba(231, 76, 60, 0.15);
 }
 
+.game-result.abandoned {
+    background: rgba(127, 140, 141, 0.15);
+}
+
 .game-result h2 {
     font-size: 2rem;
     margin-bottom: 0.5rem;
@@ -730,6 +748,11 @@ h1, h2, h3 {
 
 .ranking-table .status-lost {
     color: var(--danger-color);
+    font-weight: bold;
+}
+
+.ranking-table .status-abandoned {
+    color: var(--text-muted);
     font-weight: bold;
 }
 
