@@ -243,9 +243,15 @@ mastermind-web-game/
 | SQLite como padrão | Sem dependência externa; para usar PostgreSQL, defina a env var `DATABASE_URL` (ex: `DATABASE_URL=postgresql://user:pass@host/db`) |
 | UUID como ID dos jogos | Impede que IDs sejam adivinhados por incremento |
 | Cookie httponly para sessão | Segurança contra XSS (cookie inacessível via JS) |
-| Código secreto oculto | Só revelado pela API quando o jogo termina |
 | Senhas com bcrypt | Hash seguro via `passlib` |
-| Jogos órfãos auto-abandonados | `abandon_stale_games()` na inicialização do servidor |
+
+### Decisões de negócio
+
+| Decisão | Motivação |
+|---------|-----------|
+| Código secreto oculto | Só revelado pela API quando o jogo termina |
+| Cores podem se repetir no código secreto | Aumenta a dificuldade e as combinações possíveis (já descrito nas [regras](#regras-do-jogo)) |
+| Jogos órfãos auto-abandonados | `abandon_stale_games()` na inicialização do servidor marca jogos em andamento como abandonados |
 
 ---
 
