@@ -1,97 +1,271 @@
-# Mastermind Web Game
+# 🧠 Mastermind Web Game
 
-Implementação full-stack do clássico jogo de quebra de código **Mastermind**, desenvolvido como case técnico para a vaga de Engenheiro de Software Full-Stack Jr no Itaú.
+Implementação full-stack do clássico jogo de quebra de código **Mastermind**, desenvolvido como case técnico para a vaga de **Engenheiro de Software Full-Stack Jr** no Itaú.
 
-## Regras do Jogo
+O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, recebendo feedback lógico a cada palpite — pinos pretos (cor e posição corretas) e pinos brancos (cor certa, posição errada).
+
+---
+
+## Funcionalidades
+
+- **Autenticação completa** — registro, login e logout com sessões via cookie (httponly)
+- **Jogo interativo** — seletor de cores visual, timer em tempo real e feedback com pinos
+- **Sistema de pontuação** — cálculo baseado em tentativas e tempo (máx. 1000 pontos)
+- **Ranking global** — tabela pública com todos os jogadores ordenados por pontuação
+- **Histórico pessoal** — todas as partidas do usuário com status, duração e timestamps
+- **Dashboard personalizado** — estatísticas do jogador, regras e mini-ranking
+- **Abandono de partida** — possibilidade de abandonar jogos em andamento
+- **Responsivo** — interface adaptada para desktop e mobile (breakpoint em 600px)
+
+---
+
+## Screenshots
+
+### Autenticação
+
+| Tela | Preview |
+|------|---------|
+| Login | ![Login](docs/screenshots/login.png) |
+| Cadastro | ![Cadastro](docs/screenshots/register.png) |
+
+<!-- 📸 SCREENSHOT: Tela de login com campos de usuário e senha -->
+<!-- 📸 SCREENSHOT: Tela de cadastro com validação inline dos campos -->
+
+### Dashboard
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+<!-- 📸 SCREENSHOT: Dashboard mostrando saudação, estatísticas do usuário, regras e mini-ranking -->
+
+### Jogo
+
+![Tela do jogo](docs/screenshots/game.png)
+
+<!-- 📸 SCREENSHOT: Tela do jogo com seletor de cores, tentativa atual e histórico de tentativas -->
+
+![Demo do jogo](docs/gifs/demo.gif)
+
+<!-- 📸 GIF: Partida completa — seleção de cores, envio, feedback com pinos, até vitória/derrota -->
+
+| Momento | Preview |
+|---------|---------|
+| Selecionando cores | ![Seleção](docs/screenshots/selecao-cores.png) |
+| Feedback com pinos | ![Feedback](docs/screenshots/feedback-pinos.png) |
+| Vitória | ![Vitória](docs/screenshots/vitoria.png) |
+| Derrota (código revelado) | ![Derrota](docs/screenshots/derrota.png) |
+
+### Histórico de Partidas
+
+![Histórico](docs/screenshots/historico.png)
+
+<!-- 📸 SCREENSHOT: Tabela de partidas do usuário com status, tentativas, pontuação, duração e datas -->
+
+### Ranking global
+
+![Ranking](docs/screenshots/ranking.png)
+
+<!-- 📸 SCREENSHOT: Ranking completo com posição, jogador, status, tentativas, pontuação e duração -->
+
+### Responsivo (Mobile)
+
+| Tela | Preview |
+|------|---------|
+| Dashboard mobile | ![Mobile Dashboard](docs/screenshots/mobile-dashboard.png) |
+| Jogo mobile | ![Mobile Jogo](docs/screenshots/mobile-jogo.png) |
+
+<!-- 📸 SCREENSHOT: Qualquer tela no viewport mobile (~375px) mostrando o layout responsivo -->
+
+### API (Swagger)
+
+![Swagger - 1](docs/screenshots/swagger-1.png)
+
+![Swagger - 2](docs/screenshots/swagger-2.png)
+
+<!-- 📸 SCREENSHOT: Telas do Swagger UI em /docs com os endpoints e schemas expandidos -->
+
+---
+
+## Regras do jogo
 
 - O sistema gera um **código secreto** de 4 cores (de 6 possíveis)
-- Cores disponíveis: Vermelho, Azul, Verde, Amarelo, Laranja, Roxo
+- Cores disponíveis: 🔴 Vermelho, 🔵 Azul, 🟢 Verde, 🟡 Amarelo, 🟠 Laranja, 🟣 Roxo
 - Cores **podem se repetir** no código secreto
 - O jogador tem **10 tentativas** para adivinhar o código
 - Após cada tentativa, o sistema retorna feedback:
-  - **Pino preto**: cor certa na posição certa
-  - **Pino branco**: cor certa na posição errada
-- **Vitória**: 4 pinos pretos | **Derrota**: 10 tentativas sem acertar
+  - **Pino preto ⚫** — cor certa na posição certa
+  - **Pino branco ⚪** — cor certa na posição errada
+- **Vitória**: 4 pinos pretos (código decifrado)
+- **Derrota**: 10 tentativas sem acertar
+- **Pontuação**: `1000 - (tentativas - 1) × 100 - tempo_em_segundos ÷ 10` (mínimo 0)
+
+---
 
 ## Tech Stack
 
-| Camada    | Tecnologia          | Propósito                     |
-|-----------|---------------------|-------------------------------|
-| Backend   | Python + FastAPI    | API REST + servidor estático  |
-| Frontend  | HTML + CSS + JS     | Interface do jogo (vanilla)   |
-| Banco     | SQLite              | Persistência dos dados        |
+| Camada   | Tecnologia            | Propósito                                |
+|----------|-----------------------|------------------------------------------|
+| Backend  | Python 3 + FastAPI    | API REST + servidor de arquivos estáticos |
+| Frontend | HTML + CSS + JS puro  | Interface do jogo (sem frameworks)        |
+| Banco    | SQLite                | Persistência (PostgreSQL via env var)     |
+| Testes   | pytest + mini framework JS | Cobertura backend e frontend         |
+
+---
 
 ## Quick Start
 
-### Opção 1: Rodar Localmente (recomendado)
+### Pré-requisitos
+
+- Python 3.10+
+- pip
+
+### Instalação e execução
 
 ```bash
-# Instalar dependências do backend
+# 1. Clonar o repositório
+git clone https://github.com/seu-usuario/mastermind-web-game.git
+cd mastermind-web-game
+
+# 2. Instalar dependências
 cd backend
 pip install -r requirements.txt
 
-# Iniciar o servidor (também serve o frontend)
+# 3. Iniciar o servidor (frontend servido automaticamente)
 uvicorn app.main:app --reload --port 8000
 ```
 
 Acesse:
-- **Jogo**: http://localhost:8000
-- **API Docs (Swagger)**: http://localhost:8000/docs
 
-### Opção 2: Frontend direto no navegador
+- **Jogo**: [http://localhost:8000](http://localhost:8000)
+- **API Docs (Swagger)**: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-O frontend também funciona abrindo `frontend/index.html` diretamente no navegador (com CORS habilitado no backend).
+> **Importante:** Não abra `frontend/index.html` diretamente no navegador — a autenticação via cookies requer same-origin (servido pelo FastAPI).
+
+---
 
 ## Testes
 
+### Backend
+
 ```bash
 cd backend
+
+# Todos os testes
 python -m pytest app/tests/ -v
+
+# Apenas unitários (lógica do jogo)
+python -m pytest app/tests/test_game_logic.py -v
+
+# Integração do jogo
+python -m pytest app/tests/test_api.py -v
+
+# Integração de autenticação
+python -m pytest app/tests/test_auth.py -v
 ```
+
+Os testes usam SQLite em memória (`StaticPool`) — não afetam o banco de dados real.
+
+### Frontend
+
+Abra no navegador: [http://localhost:8000/tests/index.html](http://localhost:8000/tests/index.html)
+
+Testes cobrem validação de formulários, constantes, formatação de dados e lógica de feedback.
+
+---
 
 ## API Endpoints
 
-| Método | Rota                      | Descrição                    | Status |
-|--------|---------------------------|------------------------------|--------|
-| POST   | `/games/`                 | Criar novo jogo              | 201    |
-| POST   | `/games/{id}/guesses`     | Enviar tentativa             | 201    |
-| GET    | `/games/{id}`             | Consultar estado do jogo     | 200    |
-| GET    | `/games/ranking/`         | Ranking de partidas          | 200    |
-| GET    | `/health`                 | Health check                 | 200    |
-| GET    | `/`                       | Serve o frontend             | 200    |
+| Método | Rota | Auth | Descrição |
+|--------|------|:----:|-----------|
+| `POST` | `/auth/register` | ✗ | Registrar novo usuário |
+| `POST` | `/auth/login` | ✗ | Login (retorna cookie `session_id`) |
+| `POST` | `/auth/logout` | ✓ | Logout (remove sessão) |
+| `GET` | `/auth/me` | ✓ | Dados do usuário autenticado |
+| `GET` | `/auth/me/stats` | ✓ | Estatísticas e melhor pontuação |
+| `POST` | `/games/` | ✓ | Criar novo jogo |
+| `POST` | `/games/{id}/guesses` | ✓ | Enviar tentativa |
+| `POST` | `/games/{id}/abandon` | ✓ | Abandonar jogo em andamento |
+| `GET` | `/games/{id}` | ✓ | Estado do jogo |
+| `GET` | `/games/my-games/` | ✓ | Histórico de partidas do usuário |
+| `GET` | `/games/ranking/` | ✗ | Ranking (público) |
+| `GET` | `/health` | ✗ | Health check |
 
-## Estrutura do Projeto
+---
+
+## Estrutura do projeto
 
 ```
+mastermind-web-game/
 ├── backend/
-│   ├── requirements.txt
+│   ├── requirements.txt          # Dependências Python
+│   ├── data/                     # Banco SQLite (criado automaticamente)
 │   └── app/
-│       ├── main.py             # Entrada do FastAPI (inclui static files)
-│       ├── config.py           # Configurações (SQLite por padrão)
-│       ├── database.py         # Conexão com o banco
-│       ├── models.py           # Tabelas (Game, Guess)
-│       ├── schemas.py          # Validação de dados
-│       ├── game_logic.py       # Algoritmo do Mastermind
-│       ├── routers/game.py     # Endpoints da API
-│       └── tests/              # Testes unitários e de integração
+│       ├── main.py               # Entrada FastAPI (lifespan, static files, error handlers)
+│       ├── config.py             # Configurações (DATABASE_URL, paths)
+│       ├── database.py           # Engine e SessionLocal do SQLAlchemy
+│       ├── models.py             # Modelos ORM (User, Session, Game, Guess)
+│       ├── schemas.py            # Schemas Pydantic (request/response)
+│       ├── game_logic.py         # Algoritmo puro do Mastermind (sem dependências)
+│       ├── dependencies.py       # Dependências FastAPI (autenticação via cookie)
+│       ├── routers/
+│       │   ├── auth.py           # Endpoints de autenticação
+│       │   └── game.py           # Endpoints do jogo
+│       ├── services/
+│       │   ├── auth_service.py   # Lógica de negócio de auth
+│       │   └── game_service.py   # Lógica de negócio do jogo
+│       └── tests/
+│           ├── conftest.py       # Fixtures (SQLite in-memory, client)
+│           ├── test_game_logic.py  # Testes unitários
+│           ├── test_api.py       # Testes de integração (jogo)
+│           └── test_auth.py      # Testes de integração (auth)
 ├── frontend/
-│   ├── index.html              # Página única (SPA simulada)
+│   ├── index.html                # SPA — seções: auth, dashboard, game, history, ranking
+│   ├── favicon.svg               # Ícone do site
 │   ├── css/
-│   │   └── style.css           # Estilos
-│   └── js/
-│       ├── api.js              # Chamadas HTTP para o backend
-│       └── app.js              # Lógica da interface
-└── data/                       # Banco SQLite (criado automaticamente)
+│   │   └── style.css             # Estilos (variáveis CSS, responsivo)
+│   ├── js/
+│   │   ├── validation.js         # Validação e formatação (funções puras)
+│   │   ├── api.js                # Chamadas HTTP (credentials: include)
+│   │   └── app.js                # Estado, navegação e lógica da interface
+│   └── tests/
+│       ├── index.html            # Runner de testes no navegador
+│       ├── test-utils.js         # Mini framework (describe/it/assert)
+│       ├── test-validation.js    # Testes de validação de formulários
+│       └── test-game-logic.js    # Testes de constantes e formatação
+└── docs/
+    └── screenshots/              # Capturas de tela do projeto
+    └── gifs/                     # GIFs do projeto
 ```
 
-## Decisões Arquiteturais
+---
 
-- **Stack simplificada**: HTML/CSS/JS puro no frontend (sem frameworks/build)
-- **SQLite como padrão**: Não precisa instalar banco de dados separado
-- **FastAPI serve tudo**: API + arquivos estáticos em um único processo
-- **UUID como ID dos jogos**: Impede que IDs sejam adivinhados por incremento
-- **Código secreto oculto**: Só revelado via API quando o jogo termina
+## Arquitetura
 
-## Screenshots
+```text
+[Browser] ─── GET / ───▶ [FastAPI :8000] ─── serve ──▶ [HTML/CSS/JS estáticos]
+                              │
+                              ├── /auth/*  ──▶ [auth_service] ──▶ [SQLite]
+                              └── /games/* ──▶ [game_service] ──▶ [SQLite]
+```
 
-Adicionar screenshots/GIFs do jogo em ação aqui.
+**Um único processo** FastAPI que serve a API REST e os arquivos estáticos do frontend.
+
+### Decisões arquiteturais
+
+| Decisão | Motivação |
+|---------|-----------|
+| Frontend vanilla (sem frameworks) | Simplicidade, zero build step, foco no fundamento |
+| SQLite como padrão | Sem dependência externa; PostgreSQL disponível via `DATABASE_URL` |
+| FastAPI serve tudo | Um único processo para API + frontend |
+| UUID como ID dos jogos | Impede que IDs sejam adivinhados por incremento |
+| Cookie httponly para sessão | Segurança contra XSS (cookie inacessível via JS) |
+| Código secreto oculto | Só revelado pela API quando o jogo termina |
+| Senhas com bcrypt | Hash seguro via `passlib` |
+| Jogos órfãos auto-abandonados | `abandon_stale_games()` na inicialização do servidor |
+
+---
+
+## Licença
+
+Este projeto está licenciado sob a [MIT License](LICENSE).
+
+---
