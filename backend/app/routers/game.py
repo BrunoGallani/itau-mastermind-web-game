@@ -31,7 +31,7 @@ router = APIRouter(prefix="/games", tags=["games"])
 
 
 @router.post("/", response_model=GameCreateResponse, status_code=status.HTTP_201_CREATED)
-def create_game_endpoint(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def create_game_endpoint(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> GameCreateResponse:
     game = create_game(user, db)
     return GameCreateResponse(
         game_id=str(game.id),
@@ -49,29 +49,40 @@ def submit_guess_endpoint(
     guess_data: GuessCreate,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-):
+) -> GuessSubmitResponse:
     result = submit_guess(game_id, guess_data.colors, user, db)
     return GuessSubmitResponse(
-        attempt_number=result["attempt_number"],
-        feedback=FeedbackResponse(**result["feedback"]),
-        status=result["status"],
-        attempts_left=result["attempts_left"],
-        score=result["score"],
-        secret_code=result["secret_code"],
+        attempt_number=result.attempt_number,
+        feedback=FeedbackResponse(black_pegs=result.feedback.black_pegs, white_pegs=result.feedback.white_pegs),
+        status=result.status,
+        attempts_left=result.attempts_left,
+        score=result.score,
+        secret_code=result.secret_code,
     )
 
 
 @router.get("/ranking/", response_model=list[RankingEntryResponse])
-def get_ranking_endpoint(db: Session = Depends(get_db)):
+def get_ranking_endpoint(db: Session = Depends(get_db)) -> list[RankingEntryResponse]:
     ranking = get_ranking(db)
-    return [RankingEntryResponse(**entry) for entry in ranking]
+    return [
+        RankingEntryResponse(
+            game_id=entry.game_id,
+            username=entry.username,
+            status=entry.status,
+            attempts_used=entry.attempts_used,
+            max_attempts=entry.max_attempts,
+            score=entry.score,
+            duration_seconds=entry.duration_seconds,
+        )
+        for entry in ranking
+    ]
 
 
 @router.get("/my-games/", response_model=list[GameSummaryResponse])
 def get_my_games(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-):
+) -> list[GameSummaryResponse]:
     games = get_user_games(user, db)
     return [
         GameSummaryResponse(
@@ -93,7 +104,7 @@ def abandon_game_endpoint(
     game_id: UUID,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-):
+) -> AbandonResponse:
     game = abandon_game(game_id, user, db)
     return AbandonResponse(
         game_id=str(game.id),
@@ -109,7 +120,7 @@ def get_game_state_endpoint(
     game_id: UUID,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-):
+) -> GameStateResponse:
     game = get_game_state(game_id, user, db)
 
     guesses = [
