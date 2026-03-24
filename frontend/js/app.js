@@ -206,10 +206,18 @@ function showSection(sectionId) {
         return;
     }
 
-    // Alterna tipo dos inputs de senha para evitar popup de gerenciadores de senha
-    ['login-password', 'register-password', 'register-password-confirm'].forEach(id => {
+    // Alterna tipo e autocomplete dos inputs de senha para evitar popup de gerenciadores de senha
+    const senhaFields = [
+        { id: 'login-password', ac: 'current-password' },
+        { id: 'register-password', ac: 'new-password' },
+        { id: 'register-password-confirm', ac: 'new-password' },
+    ];
+    senhaFields.forEach(({ id, ac }) => {
         const input = document.getElementById(id);
-        if (input) input.type = sectionId === 'auth' ? 'password' : 'text';
+        if (input) {
+            input.type = sectionId === 'auth' ? 'password' : 'text';
+            input.autocomplete = sectionId === 'auth' ? ac : 'off';
+        }
     });
 
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
