@@ -98,7 +98,7 @@ O jogador deve descobrir um código secreto de 4 cores em até 10 tentativas, re
 
 ### Pré-requisitos
 
-- Python 3.10+
+- Python 3.13+
 - pip
 
 ### Instalação e execução
