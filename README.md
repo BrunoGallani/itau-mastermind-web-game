@@ -184,44 +184,44 @@ Testes cobrem validação de formulários, constantes, formatação de dados e l
 ```
 mastermind-web-game/
 ├── backend/
-│   ├── requirements.txt          # Dependências Python
-│   ├── data/                     # Banco SQLite (criado automaticamente)
+│   ├── requirements.txt            # Dependências Python
+│   ├── data/                       # Banco SQLite (criado automaticamente)
 │   └── app/
-│       ├── main.py               # Entrada FastAPI (lifespan, static files, error handlers)
-│       ├── config.py             # Configurações (DATABASE_URL, paths)
-│       ├── database.py           # Engine e SessionLocal do SQLAlchemy
-│       ├── models.py             # Modelos ORM (User, Session, Game, Guess)
-│       ├── schemas.py            # Schemas Pydantic (request/response)
-│       ├── game_logic.py         # Algoritmo puro do Mastermind (sem dependências)
-│       ├── dependencies.py       # Dependências FastAPI (autenticação via cookie)
+│       ├── main.py                 # Entrada FastAPI (lifespan, static files, error handlers)
+│       ├── config.py               # Configurações (DATABASE_URL, paths)
+│       ├── database.py             # Engine e SessionLocal do SQLAlchemy
+│       ├── models.py               # Modelos ORM (User, Session, Game, Guess)
+│       ├── schemas.py              # Schemas Pydantic (request/response)
+│       ├── game_logic.py           # Algoritmo puro do Mastermind (sem dependências)
+│       ├── dependencies.py         # Dependências FastAPI (autenticação via cookie)
 │       ├── routers/
-│       │   ├── auth.py           # Endpoints de autenticação
-│       │   └── game.py           # Endpoints do jogo
+│       │   ├── auth.py             # Endpoints de autenticação
+│       │   └── game.py             # Endpoints do jogo
 │       ├── services/
-│       │   ├── auth_service.py   # Lógica de negócio de auth
-│       │   └── game_service.py   # Lógica de negócio do jogo
+│       │   ├── auth_service.py     # Lógica de negócio de auth
+│       │   └── game_service.py     # Lógica de negócio do jogo
 │       └── tests/
-│           ├── conftest.py       # Fixtures (SQLite in-memory, client)
+│           ├── conftest.py         # Fixtures (SQLite in-memory, client)
 │           ├── test_game_logic.py  # Testes unitários
-│           ├── test_api.py       # Testes de integração (jogo)
-│           └── test_auth.py      # Testes de integração (auth)
+│           ├── test_api.py         # Testes de integração (jogo)
+│           └── test_auth.py        # Testes de integração (auth)
 ├── frontend/
-│   ├── index.html                # SPA - seções: auth, dashboard, game, history, ranking
-│   ├── favicon.svg               # Ícone do site
+│   ├── index.html                  # SPA - seções: auth, dashboard, game, history, ranking
+│   ├── favicon.svg                 # Ícone do site
 │   ├── css/
-│   │   └── style.css             # Estilos (variáveis CSS, responsivo)
+│   │   └── style.css               # Estilos (variáveis CSS, responsivo)
 │   ├── js/
-│   │   ├── validation.js         # Validação e formatação (funções puras)
-│   │   ├── api.js                # Chamadas HTTP (credentials: include)
-│   │   └── app.js                # Estado, navegação e lógica da interface
+│   │   ├── validation.js           # Validação e formatação (funções puras)
+│   │   ├── api.js                  # Chamadas HTTP (credentials: include)
+│   │   └── app.js                  # Estado, navegação e lógica da interface
 │   └── tests/
-│       ├── index.html            # Runner de testes no navegador
-│       ├── test-utils.js         # Mini framework (describe/it/assert)
-│       ├── test-validation.js    # Testes de validação de formulários
-│       └── test-game-logic.js    # Testes de constantes e formatação
+│       ├── index.html              # Runner de testes no navegador
+│       ├── test-utils.js           # Mini framework (describe/it/assert)
+│       ├── test-validation.js      # Testes de validação de formulários
+│       └── test-game-logic.js      # Testes de constantes e formatação
 └── docs/
-    └── screenshots/              # Capturas de tela do projeto
-    └── gifs/                     # GIFs do projeto
+    └── screenshots/                # Capturas de tela do projeto
+    └── gifs/                       # GIFs do projeto
 ```
 
 ---
