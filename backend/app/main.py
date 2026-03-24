@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.exceptions import RequestValidationError
+from app.config import settings
 from app.database import engine, Base, SessionLocal
 from app.errors import INTERNAL_SERVER_ERROR
 from app.routers import game, auth
@@ -30,18 +31,18 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(
-    title="Mastermind API",
-    description="API REST para o jogo Mastermind",
-    version="1.0.0",
+    title=settings.app_title,
+    description=settings.app_description,
+    version=settings.app_version,
     lifespan=lifespan,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=settings.cors_origins,
+    allow_credentials=settings.cors_allow_credentials,
+    allow_methods=settings.cors_allow_methods,
+    allow_headers=settings.cors_allow_headers,
 )
 
 _STATUS_TITLES: dict[int, str] = {

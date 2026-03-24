@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from fastapi import HTTPException
 
-from app.config import utc_now
+from app.config import utc_now, settings
 from app.database import persist, save
 from app.errors import USERNAME_EXISTS, INVALID_CREDENTIALS
 from app.models import User, Session as SessionModel, Game
@@ -13,7 +13,6 @@ from app.game_logic import GameStatus
 from app.dto import UserStats
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SESSION_DURATION_HOURS = 24
 
 
 def register_user(username: str, password: str, db: Session) -> tuple[User, SessionModel]:
@@ -74,7 +73,7 @@ def _create_session(user_id: UUID, db: Session) -> SessionModel:
     """Cria uma nova sessão para o usuário."""
     session = SessionModel(
         user_id=user_id,
-        expires_at=utc_now() + timedelta(hours=SESSION_DURATION_HOURS),
+        expires_at=utc_now() + timedelta(hours=settings.session_duration_hours),
     )
     persist(db, session)
     return session

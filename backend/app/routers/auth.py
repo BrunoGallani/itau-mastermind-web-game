@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.database import get_db
 from app.models import User
 from app.schemas import UserCreate, UserLogin, UserResponse, AuthResponse, UserStatsResponse
@@ -12,7 +13,6 @@ from app.services.auth_service import (
     authenticate_user,
     logout_user,
     get_user_stats,
-    SESSION_DURATION_HOURS,
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -22,9 +22,9 @@ def _set_session_cookie(response: Response, session_id: UUID) -> None:
     response.set_cookie(
         key="session_id",
         value=str(session_id),
-        httponly=True,
-        max_age=SESSION_DURATION_HOURS * 3600,
-        samesite="lax",
+        httponly=settings.cookie_httponly,
+        max_age=settings.session_duration_hours * 3600,
+        samesite=settings.cookie_samesite,
     )
 
 
