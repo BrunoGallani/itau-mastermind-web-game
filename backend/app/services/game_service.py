@@ -82,8 +82,7 @@ def submit_guess(game_id: UUID, colors: list[str], user: User, db: Session) -> G
         )
 
     current_attempt = len(game.guesses) + 1
-    raw_feedback = evaluate_guess(game.secret_code, colors)
-    feedback = Feedback(black_pegs=raw_feedback["black_pegs"], white_pegs=raw_feedback["white_pegs"])
+    feedback = evaluate_guess(game.secret_code, colors)
 
     guess = Guess(
         game_id=game.id,

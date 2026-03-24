@@ -1,5 +1,7 @@
 import random
 
+from app.dto import Feedback
+
 VALID_COLORS = ["Red", "Blue", "Green", "Yellow", "Orange", "Purple"]
 CODE_LENGTH = 4
 MAX_ATTEMPTS = 10
@@ -20,7 +22,7 @@ def generate_secret_code() -> list[str]:
     return [random.choice(VALID_COLORS) for _ in range(CODE_LENGTH)]
 
 
-def evaluate_guess(secret: list[str], guess: list[str]) -> dict:
+def evaluate_guess(secret: list[str], guess: list[str]) -> Feedback:
     black_pegs = 0
     secret_remaining = []
     guess_remaining = []
@@ -38,7 +40,7 @@ def evaluate_guess(secret: list[str], guess: list[str]) -> dict:
             white_pegs += 1
             secret_remaining.remove(color)
 
-    return {"black_pegs": black_pegs, "white_pegs": white_pegs}
+    return Feedback(black_pegs=black_pegs, white_pegs=white_pegs)
 
 
 def calculate_score(attempts_used: int, duration_seconds: int) -> int:
