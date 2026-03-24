@@ -7,7 +7,7 @@ from app.config import settings
 from app.constants import AuthMessage
 from app.database import get_db
 from app.models import User
-from app.schemas import UserCreate, UserLogin, UserResponse, AuthResponse, UserStatsResponse
+from app.schemas import UserCreate, UserLogin, UserResponse, AuthResponse, MessageResponse, UserStatsResponse
 from app.dependencies import get_current_user
 from app.services.auth_service import (
     register_user,
@@ -47,15 +47,15 @@ def login(user_data: UserLogin, response: Response, db: Session = Depends(get_db
     return AuthResponse(message=AuthMessage.LOGIN_SUCCESS, user=_build_user_response(user))
 
 
-@router.post("/logout")
+@router.post("/logout", response_model=MessageResponse)
 def logout(
     response: Response,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-) -> dict[str, str]:
+) -> MessageResponse:
     logout_user(user, db)
     response.delete_cookie(key="session_id")
-    return {"message": AuthMessage.LOGOUT_SUCCESS}
+    return MessageResponse(message=AuthMessage.LOGOUT_SUCCESS)
 
 
 @router.get("/me", response_model=UserResponse)

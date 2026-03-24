@@ -11,6 +11,7 @@ from app.config import settings
 from app.database import engine, Base, SessionLocal
 from app.constants import HttpError, HttpMeta, STATUS_TITLES
 from app.routers import game, auth
+from app.schemas import MessageResponse
 from app.services.game_service import abandon_stale_games
 import app.models  # noqa: F401
 
@@ -102,9 +103,9 @@ app.include_router(auth.router)
 app.include_router(game.router)
 
 
-@app.get("/health")
-def health_check() -> dict[str, str]:
-    return {"status": "ok"}
+@app.get("/health", response_model=MessageResponse)
+def health_check() -> MessageResponse:
+    return MessageResponse(message="ok")
 
 
 if FRONTEND_DIR.exists():
