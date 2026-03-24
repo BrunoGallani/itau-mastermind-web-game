@@ -36,6 +36,10 @@ class UserResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class MessageResponse(BaseModel):
+    message: str
+
+
 class AuthResponse(BaseModel):
     message: str
     user: UserResponse
