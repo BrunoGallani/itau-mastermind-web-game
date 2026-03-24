@@ -103,7 +103,7 @@ def test_secret_code_hidden_during_game(client):
 def test_health_check(unauthenticated_client):
     resp = unauthenticated_client.get("/health")
     assert resp.status_code == 200
-    assert resp.json() == {"status": "ok"}
+    assert resp.json() == {"message": "ok"}
 
 
 def test_create_game_unauthenticated(unauthenticated_client):
